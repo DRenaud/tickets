@@ -1,0 +1,40 @@
+<div
+  class="app-root"
+  [style.--bg]="store.theme().bg"
+  [style.--bg-elevated]="store.theme().bgElevated"
+  [style.--bg-hover]="store.theme().bgHover"
+  [style.--border]="store.theme().border"
+  [style.--text]="store.theme().text"
+  [style.--text-muted]="store.theme().textMuted"
+  [style.--accent]="store.theme().accent"
+  [style.--accent-soft]="store.theme().accentSoft"
+  [style.--mint]="store.theme().mint"
+  [style.--mint-soft]="store.theme().mintSoft"
+  [style.--amber]="store.theme().amber"
+  [style.--coral]="store.theme().coral"
+>
+  <app-header />
+
+  <div class="content">
+    <div class="greeting">{{ store.greeting() }}</div>
+
+    <app-stats-bar />
+    <app-tabs-nav />
+
+    @switch (store.tab()) {
+      @case ('backlog') {
+        <app-backlog-view />
+      }
+      @case ('kanban') {
+        <app-kanban-view />
+      }
+      @case ('resolved') {
+        <app-resolved-view />
+      }
+    }
+  </div>
+
+  <app-ticket-picker />
+  <app-new-ticket-modal />
+  <app-toast-notification />
+</div>

@@ -1,0 +1,38 @@
+.stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  flex: 1;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  text-align: center;
+}
+
+.stat-value {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+}
+
+.stat-backlog {
+  color: var(--text);
+}
+
+.stat-sprint {
+  color: var(--accent);
+}
+
+.stat-resolved {
+  color: var(--mint);
+}
+
+.stat-label {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}

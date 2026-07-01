@@ -1,0 +1,12 @@
+<div class="tabs" role="tablist">
+  @for (tab of tabs; track tab.key) {
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.tab-active]="store.tab() === tab.key"
+      [attr.aria-selected]="store.tab() === tab.key"
+      (click)="store.setTab(tab.key)"
+    >{{ tab.label }}</button>
+  }
+</div>

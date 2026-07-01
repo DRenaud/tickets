@@ -1,0 +1,162 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: 'Sora', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--text);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.add-btn {
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  background: transparent;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.columns {
+  display: flex;
+  gap: 16px;
+}
+
+.column {
+  flex: 1;
+}
+
+.column-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
+}
+
+.card-resolved {
+  opacity: 0.6;
+}
+
+.card-resolved:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.card-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.card-title-done {
+  text-decoration: line-through;
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.priority-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.prio-high {
+  background: var(--coral);
+}
+
+.prio-medium {
+  background: var(--amber);
+}
+
+.prio-low {
+  background: var(--mint);
+}
+
+.category {
+  font-size: 11.5px;
+  color: var(--text-muted);
+}
+
+.assignee {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.advance-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.advance-accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.advance-accent:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.advance-mint {
+  background: var(--mint-soft);
+  color: var(--mint);
+}
+
+.advance-mint:hover {
+  background: var(--mint);
+  color: #fff;
+}
+
+.version {
+  font-size: 11.5px;
+  color: var(--mint);
+  font-weight: 600;
+}

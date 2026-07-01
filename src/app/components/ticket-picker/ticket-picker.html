@@ -1,0 +1,23 @@
+@if (store.pickerOpen()) {
+  <div class="overlay" (click)="store.togglePicker()">
+    <div class="panel" (click)="stopPropagation($event)">
+      <div class="panel-header">
+        <div class="title">Ajouter depuis le backlog</div>
+        <div class="spacer"></div>
+        <button type="button" class="close-btn" aria-label="Fermer" (click)="store.togglePicker()">×</button>
+      </div>
+      @for (item of store.allBacklogList(); track item.id) {
+        <div class="row">
+          <div class="priority-dot" [class]="'prio-' + item.priority"></div>
+          <div class="row-title">{{ item.title }}</div>
+          <button
+            type="button"
+            class="add-btn"
+            [attr.aria-label]="'Ajouter ' + item.title + ' au sprint'"
+            (click)="store.addFromBacklogToSprint(item.id)"
+          >+</button>
+        </div>
+      }
+    </div>
+  </div>
+}

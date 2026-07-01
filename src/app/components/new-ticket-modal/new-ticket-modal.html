@@ -1,0 +1,62 @@
+@if (store.newTicketOpen()) {
+  <div class="overlay" (click)="close()">
+    <div class="modal" (click)="stopPropagation($event)">
+      <div class="modal-header">
+        <div class="title">Nouveau ticket</div>
+        <div class="spacer"></div>
+        <button type="button" class="close-btn" aria-label="Fermer" (click)="close()">×</button>
+      </div>
+
+      <label class="field-label" for="new-ticket-title">Titre</label>
+      <input
+        id="new-ticket-title"
+        [formField]="ticketForm.title"
+        placeholder="Le bouton fait n'importe quoi…"
+        class="text-input"
+      />
+
+      <label class="field-label" for="new-ticket-description">Description</label>
+      <textarea
+        id="new-ticket-description"
+        [formField]="ticketForm.description"
+        placeholder="Détails, étapes pour reproduire…"
+        class="text-area"
+      ></textarea>
+
+      <div class="row-fields">
+        <div class="field-group">
+          <div class="field-label">Priorité</div>
+          <div class="pills">
+            @for (p of priorityOptions; track p.key) {
+              <button
+                type="button"
+                class="priority-pill"
+                [class.priority-pill-active]="priority() === p.key"
+                [class]="'prio-' + p.key"
+                (click)="setPriority(p.key)"
+              >{{ p.label }}</button>
+            }
+          </div>
+        </div>
+        <div class="field-group">
+          <div class="field-label">Catégorie</div>
+          <div class="pills">
+            @for (c of categoryOptions; track c) {
+              <button
+                type="button"
+                class="category-pill"
+                [class.category-pill-active]="category() === c"
+                (click)="setCategory(c)"
+              >{{ categoryMeta(c).emoji }}</button>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="cancel-btn" (click)="close()">Annuler</button>
+        <button type="button" class="submit-btn" [disabled]="!canSubmit()" (click)="submit()">Créer le ticket 🚀</button>
+      </div>
+    </div>
+  </div>
+}

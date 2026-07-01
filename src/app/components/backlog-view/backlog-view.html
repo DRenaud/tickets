@@ -1,0 +1,38 @@
+<div class="filters">
+  @for (f of filters; track f.key) {
+    <button
+      type="button"
+      class="filter-pill"
+      [class.filter-active]="store.filterPriority() === f.key"
+      (click)="store.setFilterPriority(f.key)"
+    >{{ f.label }}</button>
+  }
+</div>
+
+@if (store.hasSelection()) {
+  <div class="selection-banner">
+    <div class="selection-count">{{ store.selectedCount() }} sélectionné(s)</div>
+    <div class="spacer"></div>
+    <button type="button" class="link-btn" (click)="store.clearSelection()">Annuler</button>
+    <button type="button" class="sprint-btn" (click)="store.addSelectedToSprint()">Ajouter au sprint →</button>
+  </div>
+}
+
+<div class="list">
+  @for (item of store.backlogList(); track item.id) {
+    <div class="row">
+      <button
+        type="button"
+        class="checkbox"
+        [class.checkbox-checked]="store.isSelected(item.id)"
+        [attr.aria-pressed]="store.isSelected(item.id)"
+        [attr.aria-label]="'Sélectionner ' + item.title"
+        (click)="store.toggleSelect(item.id)"
+      >{{ store.isSelected(item.id) ? '✓' : '' }}</button>
+      <div class="priority-dot" [class]="'prio-' + item.priority"></div>
+      <div class="title">{{ item.title }}</div>
+      <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).label }}</div>
+      <div class="assignee">{{ item.assignee }}</div>
+    </div>
+  }
+</div>

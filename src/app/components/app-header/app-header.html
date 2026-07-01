@@ -1,0 +1,26 @@
+<div class="header">
+  <div class="logo">
+    <span>🎫</span><span>Tickets</span>
+  </div>
+
+  <div class="projects">
+    @for (proj of store.projects; track proj.id) {
+      <a
+        class="pill"
+        [routerLink]="['/', proj.id]"
+        routerLinkActive="pill-active"
+      >{{ proj.label }}</a>
+    }
+  </div>
+
+  <button
+    type="button"
+    class="theme-toggle"
+    [attr.aria-label]="store.dark() ? 'Activer le thème clair' : 'Activer le thème sombre'"
+    (click)="store.toggleDark()"
+  >{{ store.dark() ? '🌙' : '☀️' }}</button>
+
+  <button type="button" class="new-ticket" (click)="store.openNewTicket()">+ Nouveau ticket</button>
+
+  <div class="avatar" aria-hidden="true">FL</div>
+</div>

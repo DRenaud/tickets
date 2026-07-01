@@ -1,0 +1,29 @@
+<div class="groups">
+  @for (group of store.resolvedGroups(); track group.version) {
+    <div class="group">
+      <button
+        type="button"
+        class="group-header"
+        [attr.aria-expanded]="group.expanded"
+        (click)="store.toggleVersion(group.version)"
+      >
+        <div class="chevron">{{ group.expanded ? '▾' : '▸' }}</div>
+        <div class="version">{{ group.version }}</div>
+        <div class="spacer"></div>
+        <div class="count">{{ group.tickets.length }} tickets</div>
+      </button>
+      @if (group.expanded) {
+        <div class="group-body">
+          @for (item of group.tickets; track item.id) {
+            <div class="row">
+              <div class="check">✓</div>
+              <div class="title">{{ item.title }}</div>
+              <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).label }}</div>
+              <div class="assignee">{{ item.assignee }}</div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

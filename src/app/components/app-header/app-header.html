@@ -3,13 +3,24 @@
     <span>🎫</span><span>Tickets</span>
   </div>
 
-  <div class="projects">
-    @for (proj of store.projects; track proj.id) {
-      <a
-        class="pill"
-        [routerLink]="['/', proj.id]"
-        routerLinkActive="pill-active"
-      >{{ proj.label }}</a>
+  <div class="project-switcher">
+    <button type="button" class="project-trigger" (click)="toggleProjectMenu()">
+      <span class="project-trigger-label">{{ currentProjectLabel() }}</span>
+      <span class="project-trigger-chevron" [class.project-trigger-chevron-open]="projectMenuOpen()">▾</span>
+    </button>
+
+    @if (projectMenuOpen()) {
+      <div class="project-menu-backdrop" (click)="closeProjectMenu()"></div>
+      <div class="project-menu" (click)="stopPropagation($event)">
+        @for (proj of store.projects; track proj.id) {
+          <a
+            class="project-menu-item"
+            [class.project-menu-item-active]="store.project() === proj.id"
+            [routerLink]="['/', proj.id]"
+            (click)="closeProjectMenu()"
+          >{{ proj.label }}</a>
+        }
+      </div>
     }
   </div>
 

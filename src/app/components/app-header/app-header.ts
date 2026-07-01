@@ -1,11 +1,11 @@
-import { Component, computed, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, computed, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth-service';
 import { TicketStore } from '../../services/ticket-store';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css',
 })
@@ -13,6 +13,11 @@ export class AppHeader {
   protected readonly store = inject(TicketStore);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  protected readonly projectMenuOpen = signal(false);
+  protected readonly currentProjectLabel = computed(
+    () => this.store.projects.find((p) => p.id === this.store.project())?.label ?? '',
+  );
 
   protected readonly initials = computed(() => {
     const user = this.auth.user();
@@ -24,6 +29,18 @@ export class AppHeader {
       .map((part) => part[0]?.toUpperCase())
       .join('');
   });
+
+  toggleProjectMenu(): void {
+    this.projectMenuOpen.update((v) => !v);
+  }
+
+  closeProjectMenu(): void {
+    this.projectMenuOpen.set(false);
+  }
+
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
+  }
 
   async logout(): Promise<void> {
     await this.auth.signOut();

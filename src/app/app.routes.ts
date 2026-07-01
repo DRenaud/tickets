@@ -1,4 +1,5 @@
 import { CanMatchFn, Routes } from '@angular/router';
+import { authGuard, guestGuard } from './guards/auth.guard';
 
 const VALID_PROJECT_IDS = new Set(['alveola', 'ludistes']);
 
@@ -7,8 +8,14 @@ const isValidProjectId: CanMatchFn = (_route, segments) => VALID_PROJECT_IDS.has
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'alveola' },
   {
+    path: 'login',
+    canActivate: [guestGuard],
+    loadComponent: () => import('./pages/login-page/login-page').then((m) => m.LoginPage),
+  },
+  {
     path: ':projectId',
     canMatch: [isValidProjectId],
+    canActivate: [authGuard],
     loadComponent: () => import('./pages/ticket-board-page/ticket-board-page').then((m) => m.TicketBoardPage),
   },
   { path: '**', redirectTo: 'alveola' },

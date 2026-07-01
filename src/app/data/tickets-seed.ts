@@ -1,4 +1,4 @@
-import { Category, Project, ProjectId, Ticket } from '../models/ticket.model';
+import { Category, Project, ProjectId, SeedTicket } from '../models/ticket.model';
 
 export const PROJECTS: Project[] = [
   { id: 'alveola', label: 'Alvéola' },
@@ -17,7 +17,7 @@ export const CATEGORY_META: Record<Category, { emoji: string; label: string }> =
   tech: { emoji: '⚙️', label: 'Technique' },
 };
 
-export const INITIAL_TICKETS: Record<ProjectId, Ticket[]> = {
+export const INITIAL_TICKETS: Record<ProjectId, SeedTicket[]> = {
   alveola: [
     { id: 1, title: "Le bouton d'export PDF crash sur Firefox", status: 'backlog', priority: 'high', category: 'bug', assignee: 'FL' },
     { id: 2, title: 'Ajouter le mode hors-ligne', status: 'backlog', priority: 'medium', category: 'idea', assignee: 'JM' },

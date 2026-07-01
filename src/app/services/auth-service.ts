@@ -1,6 +1,4 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
-import { FirebaseApp, initializeApp } from 'firebase/app';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -12,11 +10,11 @@ import {
   signInWithPopup,
   signOut as firebaseSignOut,
 } from 'firebase/auth';
-import { firebaseConfig } from '../firebase.config';
+import { FirebaseAppService } from './firebase-app';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly firebaseApp = inject(FirebaseAppService);
   private auth: Auth | null = null;
   private readonly readyPromise: Promise<void>;
 
@@ -25,14 +23,13 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.user() !== null);
 
   constructor() {
-    if (!this.isBrowser) {
+    if (!this.firebaseApp.app) {
       this.initialized.set(true);
       this.readyPromise = Promise.resolve();
       return;
     }
 
-    const app: FirebaseApp = initializeApp(firebaseConfig);
-    this.auth = getAuth(app);
+    this.auth = getAuth(this.firebaseApp.app);
 
     this.readyPromise = new Promise((resolve) => {
       onAuthStateChanged(this.auth!, (user) => {

@@ -60,12 +60,6 @@
   margin: 0 0 6px;
 }
 
-.heading p {
-  font-size: 13.5px;
-  color: var(--text-muted);
-  margin: 0 0 22px;
-}
-
 .error-banner {
   background: color-mix(in oklch, var(--coral) 16%, transparent);
   border: 1.5px solid var(--coral);

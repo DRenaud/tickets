@@ -41,6 +41,13 @@
     "medium": "Moyenne",
     "low": "Basse"
   },
+  "status": {
+    "backlog": "Backlog",
+    "todo": "À faire",
+    "inprogress": "En cours",
+    "done": "Terminé",
+    "resolved": "Résolu"
+  },
   "category": {
     "bug": "Bug",
     "idea": "Idée",
@@ -53,13 +60,12 @@
     "selectTicket": "Sélectionner {{title}}"
   },
   "kanban": {
-    "sprintTitle": "Sprint actuel · {{count}} tickets",
+    "sprintTitle": "{{sprint}} · {{count}} tickets",
     "addFromBacklog": "+ Ajouter depuis le backlog",
-    "todo": "À faire",
-    "inProgress": "En cours",
-    "resolved": "Résolu",
+    "releaseIt": "Release-it 🚀",
+    "readyToRelease": "✓ prêt à release",
     "moveToInProgress": "Passer {{title}} en cours",
-    "resolveTicket": "Résoudre {{title}}"
+    "markDone": "Marquer {{title}} terminé"
   },
   "resolved": {
     "ticketCount": "{{count}} tickets"
@@ -67,6 +73,34 @@
   "picker": {
     "title": "Ajouter depuis le backlog",
     "addToSprint": "Ajouter {{title}} au sprint"
+  },
+  "detail": {
+    "back": "← Retour",
+    "noDescription": "Pas de description pour le moment.",
+    "comments": "Commentaires",
+    "commentPlaceholder": "Écrire un commentaire…",
+    "send": "Envoyer",
+    "priority": "Priorité",
+    "category": "Catégorie",
+    "createdBy": "Créé par",
+    "createdOn": "Créé le",
+    "version": "Version",
+    "timeSpent": "Temps passé",
+    "minutes": "min",
+    "prLink": "Lien PR",
+    "bugReports": "Rapports de bug",
+    "bugLinkPlaceholder": "Lien du rapport (BGA…)",
+    "addBugReport": "Ajouter le rapport de bug",
+    "removeBugReport": "Supprimer le rapport de bug",
+    "moveToInProgress": "Passer en cours",
+    "markDone": "Marquer terminé"
+  },
+  "release": {
+    "title": "Release-it 🚀",
+    "hint": "Les tickets \"Terminé\" seront marqués résolus sous cette version.",
+    "versionLabel": "Nom de la version",
+    "nextSprintLabel": "Nom du prochain sprint",
+    "publish": "Publier 🚀"
   },
   "newTicket": {
     "title": "Nouveau ticket",
@@ -105,9 +139,11 @@
     }
   },
   "toast": {
-    "resolved": "🎉 Résolu — {{title}}",
+    "done": "✅ Terminé — {{title}}",
     "created": "✨ Ticket créé",
     "createFailed": "⚠️ Échec de création du ticket",
-    "updateFailed": "⚠️ Échec de la mise à jour"
+    "updateFailed": "⚠️ Échec de la mise à jour",
+    "released": "🚀 {{version}} publiée · {{count}} ticket(s) · {{nextSprint}} démarré",
+    "releaseFailed": "⚠️ Échec de la publication"
   }
 }

@@ -41,6 +41,13 @@
     "medium": "Medium",
     "low": "Low"
   },
+  "status": {
+    "backlog": "Backlog",
+    "todo": "To do",
+    "inprogress": "In progress",
+    "done": "Done",
+    "resolved": "Resolved"
+  },
   "category": {
     "bug": "Bug",
     "idea": "Idea",
@@ -53,13 +60,12 @@
     "selectTicket": "Select {{title}}"
   },
   "kanban": {
-    "sprintTitle": "Current sprint · {{count}} tickets",
+    "sprintTitle": "{{sprint}} · {{count}} tickets",
     "addFromBacklog": "+ Add from backlog",
-    "todo": "To do",
-    "inProgress": "In progress",
-    "resolved": "Resolved",
+    "releaseIt": "Release-it 🚀",
+    "readyToRelease": "✓ ready to release",
     "moveToInProgress": "Move {{title}} to in progress",
-    "resolveTicket": "Resolve {{title}}"
+    "markDone": "Mark {{title}} as done"
   },
   "resolved": {
     "ticketCount": "{{count}} tickets"
@@ -67,6 +73,34 @@
   "picker": {
     "title": "Add from backlog",
     "addToSprint": "Add {{title}} to sprint"
+  },
+  "detail": {
+    "back": "← Back",
+    "noDescription": "No description yet.",
+    "comments": "Comments",
+    "commentPlaceholder": "Write a comment…",
+    "send": "Send",
+    "priority": "Priority",
+    "category": "Category",
+    "createdBy": "Created by",
+    "createdOn": "Created on",
+    "version": "Version",
+    "timeSpent": "Time spent",
+    "minutes": "min",
+    "prLink": "PR link",
+    "bugReports": "Bug reports",
+    "bugLinkPlaceholder": "Report link (BGA…)",
+    "addBugReport": "Add bug report",
+    "removeBugReport": "Remove bug report",
+    "moveToInProgress": "Move to in progress",
+    "markDone": "Mark as done"
+  },
+  "release": {
+    "title": "Release-it 🚀",
+    "hint": "\"Done\" tickets will be marked resolved under this version.",
+    "versionLabel": "Version name",
+    "nextSprintLabel": "Next sprint name",
+    "publish": "Publish 🚀"
   },
   "newTicket": {
     "title": "New ticket",
@@ -105,9 +139,11 @@
     }
   },
   "toast": {
-    "resolved": "🎉 Resolved — {{title}}",
+    "done": "✅ Done — {{title}}",
     "created": "✨ Ticket created",
     "createFailed": "⚠️ Failed to create ticket",
-    "updateFailed": "⚠️ Update failed"
+    "updateFailed": "⚠️ Update failed",
+    "released": "🚀 {{version}} released · {{count}} ticket(s) · {{nextSprint}} started",
+    "releaseFailed": "⚠️ Release failed"
   }
 }

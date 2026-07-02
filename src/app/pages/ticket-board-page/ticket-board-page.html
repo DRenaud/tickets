@@ -18,23 +18,28 @@
   <div class="content">
     <div class="greeting">{{ ('board.greeting.' + store.project()) | transloco }}</div>
 
-    <app-stats-bar />
-    <app-tabs-nav />
+    @if (store.selectedTicketId()) {
+      <app-ticket-detail-view />
+    } @else {
+      <app-stats-bar />
+      <app-tabs-nav />
 
-    @switch (store.tab()) {
-      @case ('backlog') {
-        <app-backlog-view />
-      }
-      @case ('kanban') {
-        <app-kanban-view />
-      }
-      @case ('resolved') {
-        <app-resolved-view />
+      @switch (store.tab()) {
+        @case ('backlog') {
+          <app-backlog-view />
+        }
+        @case ('kanban') {
+          <app-kanban-view />
+        }
+        @case ('resolved') {
+          <app-resolved-view />
+        }
       }
     }
   </div>
 
   <app-ticket-picker />
   <app-new-ticket-modal />
+  <app-release-modal />
   <app-toast-notification />
 </div>

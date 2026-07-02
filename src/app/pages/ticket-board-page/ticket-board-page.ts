@@ -4,9 +4,11 @@ import { AppHeader } from '../../components/app-header/app-header';
 import { BacklogView } from '../../components/backlog-view/backlog-view';
 import { KanbanView } from '../../components/kanban-view/kanban-view';
 import { NewTicketModal } from '../../components/new-ticket-modal/new-ticket-modal';
+import { ReleaseModal } from '../../components/release-modal/release-modal';
 import { ResolvedView } from '../../components/resolved-view/resolved-view';
 import { StatsBar } from '../../components/stats-bar/stats-bar';
 import { TabsNav } from '../../components/tabs-nav/tabs-nav';
+import { TicketDetailView } from '../../components/ticket-detail-view/ticket-detail-view';
 import { TicketPicker } from '../../components/ticket-picker/ticket-picker';
 import { ToastNotification } from '../../components/toast-notification/toast-notification';
 import { ProjectId } from '../../models/ticket.model';
@@ -21,8 +23,10 @@ import { TicketStore } from '../../services/ticket-store';
     BacklogView,
     KanbanView,
     ResolvedView,
+    TicketDetailView,
     TicketPicker,
     NewTicketModal,
+    ReleaseModal,
     ToastNotification,
     TranslocoPipe,
   ],

@@ -20,17 +20,7 @@ export class AppHeader {
   protected readonly currentProjectLabel = computed(
     () => this.store.projects.find((p) => p.id === this.store.project())?.label ?? '',
   );
-
-  protected readonly initials = computed(() => {
-    const user = this.auth.user();
-    const source = user?.displayName?.trim() || user?.email?.trim() || '';
-    if (!source) return '?';
-    const parts = source.includes('@') ? [source.split('@')[0]] : source.split(/\s+/);
-    return parts
-      .slice(0, 2)
-      .map((part) => part[0]?.toUpperCase())
-      .join('');
-  });
+  protected readonly initials = this.auth.initials;
 
   toggleProjectMenu(): void {
     this.projectMenuOpen.update((v) => !v);

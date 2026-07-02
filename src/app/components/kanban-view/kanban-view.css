@@ -2,6 +2,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+  gap: 10px;
 }
 
 .title {
@@ -25,6 +26,23 @@
   font-weight: 700;
   cursor: pointer;
   font-family: inherit;
+}
+
+.release-btn {
+  background: var(--mint);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.release-btn-disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .columns {
@@ -52,6 +70,7 @@
   padding: 12px 14px;
   margin-bottom: 10px;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -59,13 +78,8 @@
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.14);
 }
 
-.card-resolved {
-  opacity: 0.6;
-}
-
-.card-resolved:hover {
-  transform: none;
-  box-shadow: none;
+.card-done {
+  border: 1.5px solid var(--mint-soft);
 }
 
 .card-title {
@@ -73,10 +87,6 @@
   font-weight: 600;
   margin-bottom: 8px;
   color: var(--text);
-}
-
-.card-title-done {
-  text-decoration: line-through;
 }
 
 .card-footer {
@@ -106,20 +116,6 @@
 .category {
   font-size: 11.5px;
   color: var(--text-muted);
-}
-
-.assignee {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--bg-hover);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 9px;
-  font-weight: 700;
-  color: var(--text);
 }
 
 .advance-btn {
@@ -155,8 +151,8 @@
   color: #fff;
 }
 
-.version {
-  font-size: 11.5px;
+.ready-label {
+  font-size: 11px;
   color: var(--mint);
   font-weight: 600;
 }

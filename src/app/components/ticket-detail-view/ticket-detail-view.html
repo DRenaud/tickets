@@ -1,0 +1,135 @@
+@if (ticket(); as t) {
+  <button type="button" class="back-btn" (click)="back()">← Retour</button>
+
+  <div class="layout">
+    <div class="main">
+      <div class="title">{{ t.title }}</div>
+
+      <div class="stages">
+        @for (stage of stages(); track stage.label) {
+          <div class="stage">
+            <div class="stage-marker">
+              <div class="stage-dot" [class.stage-dot-passed]="stage.passed"></div>
+              <div class="stage-label">{{ stage.label }}</div>
+            </div>
+            <div class="stage-line" [class.stage-line-active]="stage.lineActive"></div>
+          </div>
+        }
+      </div>
+
+      <div class="description">{{ t.description || 'Pas de description pour le moment.' }}</div>
+
+      @if (t.attachments?.length) {
+        <div class="attachments">
+          @for (att of t.attachments; track att) {
+            <div class="attachment">📎 {{ att }}</div>
+          }
+        </div>
+      }
+
+      <div class="section-title">Commentaires</div>
+      <div class="comments">
+        @for (c of t.comments; track $index) {
+          <div class="comment">
+            <div class="comment-header">
+              <div class="comment-author">{{ c.author }}</div>
+              <div class="comment-time">{{ formatDateTime(c.createdAt) }}</div>
+            </div>
+            <div class="comment-text">{{ c.text }}</div>
+          </div>
+        }
+      </div>
+      <div class="comment-form">
+        <input
+          [value]="newCommentText()"
+          (input)="newCommentText.set($any($event.target).value)"
+          (keydown.enter)="submitComment()"
+          placeholder="Écrire un commentaire…"
+          class="comment-input"
+        />
+        <button type="button" class="comment-submit" (click)="submitComment()">Envoyer</button>
+      </div>
+    </div>
+
+    <div class="sidebar">
+      <div class="card">
+        <div class="field">
+          <div class="field-label">Priorité</div>
+          <div class="field-value">
+            <span class="dot" [class]="'prio-' + t.priority"></span>{{ priorityLabel(t.priority) }}
+          </div>
+        </div>
+        <div class="field">
+          <div class="field-label">Catégorie</div>
+          <div class="field-value">{{ store.categoryMeta(t.category).emoji }} {{ store.categoryMeta(t.category).label }}</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Créé par</div>
+          <div class="field-value">{{ t.createdBy }}</div>
+        </div>
+        <div class="field">
+          <div class="field-label">Créé le</div>
+          <div class="field-value">{{ formatDate(t.createdAt) }}</div>
+        </div>
+        @if (t.status === 'resolved') {
+          <div class="field">
+            <div class="field-label">Version</div>
+            <div class="field-value field-value-mint">✓ {{ t.version }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="card">
+        <div class="field-label">Temps passé</div>
+        <div class="time-spent">
+          <input
+            type="number"
+            min="0"
+            step="5"
+            [value]="t.timeSpentMinutes ?? 0"
+            (change)="onTimeSpentChange($any($event.target).value)"
+            class="time-input"
+          />
+          <span class="time-unit">min</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field">
+          <div class="field-label">Lien PR</div>
+          <input
+            [value]="t.prLink ?? ''"
+            (change)="onPrLinkChange($any($event.target).value)"
+            placeholder="https://github.com/…/pull/…"
+            class="text-input"
+          />
+        </div>
+        <div class="field">
+          <div class="field-label">Rapports de bug</div>
+          @for (link of t.bugReportLinks; track link; let i = $index) {
+            <div class="bug-link-row">
+              <a [href]="link" target="_blank" rel="noopener" class="bug-link">🐞 {{ link }}</a>
+              <button type="button" class="bug-link-remove" (click)="removeBugLink(i)">×</button>
+            </div>
+          }
+          <div class="bug-link-form">
+            <input
+              [value]="newBugLinkDraft()"
+              (input)="newBugLinkDraft.set($any($event.target).value)"
+              placeholder="Lien du rapport (BGA…)"
+              class="text-input"
+            />
+            <button type="button" class="bug-link-add" (click)="submitBugLink()">+</button>
+          </div>
+        </div>
+      </div>
+
+      @if (canAdvance()) {
+        <button type="button" class="action-btn action-btn-primary" (click)="advance()">{{ advanceLabel() }}</button>
+      }
+      @if (canAddToSprint()) {
+        <button type="button" class="action-btn action-btn-outline" (click)="addToSprint()">Ajouter au sprint →</button>
+      }
+    </div>
+  </div>
+}

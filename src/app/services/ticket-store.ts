@@ -1,16 +1,20 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import {
   CollectionReference,
+  DocumentData,
   Firestore,
+  QueryDocumentSnapshot,
   Timestamp,
   addDoc,
   collection,
+  deleteField,
   doc,
   getFirestore,
   onSnapshot,
   orderBy,
   query,
   serverTimestamp,
+  setDoc,
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
@@ -23,6 +27,7 @@ import { FirebaseAppService } from './firebase-app';
 @Injectable({ providedIn: 'root' })
 export class TicketStore {
   readonly projects = PROJECTS;
+  private readonly auth = inject(AuthService);
 
   readonly dark = signal(true);
   readonly project = signal<ProjectId>('alveola');
@@ -34,23 +39,32 @@ export class TicketStore {
   readonly expandedVersions = signal<Record<string, boolean>>({ 'v1.3.0': true, 'v0.9.0': true });
   readonly toast = signal<string | null>(null);
 
+  readonly selectedTicketId = signal<string | null>(null);
+  readonly sprintName = signal('Sprint 1');
+  readonly sprintNumber = signal(1);
+  readonly releaseModalOpen = signal(false);
+  readonly releaseForm = signal<{ version: string; nextSprint: string }>({ version: '', nextSprint: '' });
+
   private readonly db: Firestore | null;
   private readonly currentTickets = signal<Ticket[]>([]);
   private toastTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
     const firebaseApp = inject(FirebaseAppService);
-    const auth = inject(AuthService);
     this.db = firebaseApp.app ? getFirestore(firebaseApp.app) : null;
 
     effect((onCleanup) => {
       const projectId = this.project();
-      if (!auth.isAuthenticated()) {
+      if (!this.auth.isAuthenticated()) {
         this.currentTickets.set([]);
         return;
       }
-      const unsubscribe = this.subscribeToProject(projectId);
-      onCleanup(() => unsubscribe?.());
+      const unsubscribeTickets = this.subscribeToTickets(projectId);
+      const unsubscribeMeta = this.subscribeToProjectMeta(projectId);
+      onCleanup(() => {
+        unsubscribeTickets?.();
+        unsubscribeMeta?.();
+      });
     });
   }
 
@@ -65,12 +79,8 @@ export class TicketStore {
   });
   readonly todoList = computed(() => this.currentTickets().filter((t) => t.status === 'todo'));
   readonly inProgressList = computed(() => this.currentTickets().filter((t) => t.status === 'inprogress'));
+  readonly doneList = computed(() => this.currentTickets().filter((t) => t.status === 'done'));
   readonly resolvedList = computed(() => this.currentTickets().filter((t) => t.status === 'resolved'));
-  readonly sprintResolvedList = computed(() =>
-    this.resolvedList()
-      .filter((t) => t.version === 'v1.3.0' || t.version === 'v0.9.0')
-      .slice(0, 3),
-  );
 
   readonly resolvedGroups = computed(() => {
     const resolved = this.resolvedList();
@@ -85,15 +95,24 @@ export class TicketStore {
     }));
   });
 
+  readonly sprintCount = computed(
+    () => this.todoList().length + this.inProgressList().length + this.doneList().length,
+  );
+
   readonly stats = computed(() => [
     { key: 'backlog', label: 'backlog', value: this.allBacklogList().length },
-    { key: 'sprint', label: 'en sprint', value: this.todoList().length + this.inProgressList().length },
+    { key: 'sprint', label: 'en sprint', value: this.sprintCount() },
     { key: 'resolved', label: 'résolus', value: this.resolvedList().length },
   ]);
 
   readonly selectedCount = computed(() => this.selectedBacklog().size);
   readonly hasSelection = computed(() => this.selectedCount() > 0);
-  readonly sprintCount = computed(() => this.todoList().length + this.inProgressList().length);
+
+  readonly selectedTicket = computed(
+    () => this.currentTickets().find((t) => t.id === this.selectedTicketId()) ?? null,
+  );
+
+  readonly releaseCanSubmit = computed(() => this.releaseForm().version.trim().length > 0);
 
   categoryMeta(category: Category) {
     return CATEGORY_META[category];
@@ -112,6 +131,7 @@ export class TicketStore {
     this.tab.set('backlog');
     this.selectedBacklog.set(new Set());
     this.filterPriority.set('all');
+    this.selectedTicketId.set(null);
   }
 
   setTab(tab: Tab): void {
@@ -162,8 +182,8 @@ export class TicketStore {
     if (ticket.status === 'todo') {
       this.updateTicket(id, { status: 'inprogress' });
     } else if (ticket.status === 'inprogress') {
-      this.updateTicket(id, { status: 'resolved', version: 'v1.3.0' });
-      this.showToast('🎉 Résolu — ' + ticket.title);
+      this.updateTicket(id, { status: 'done' });
+      this.showToast('✅ Terminé — ' + ticket.title);
     }
   }
 
@@ -188,16 +208,117 @@ export class TicketStore {
     try {
       await addDoc(this.ticketsCollection(this.project()), {
         title,
+        description: form.description.trim(),
         status: 'backlog',
         priority: form.priority,
         category: form.category,
-        assignee: 'FL',
+        createdBy: this.auth.initials(),
         createdAt: serverTimestamp(),
       });
       this.showToast('✨ Ticket créé');
     } catch {
-      this.showToast("⚠️ Échec de création du ticket");
+      this.showToast('⚠️ Échec de création du ticket');
     }
+  }
+
+  openDetail(id: string): void {
+    this.selectedTicketId.set(id);
+  }
+
+  closeDetail(): void {
+    this.selectedTicketId.set(null);
+  }
+
+  addComment(text: string): void {
+    const trimmed = text.trim();
+    const ticket = this.selectedTicket();
+    if (!trimmed || !ticket) return;
+    const comments = [...(ticket.comments ?? []), { author: this.auth.initials(), text: trimmed, createdAt: Timestamp.now() }];
+    this.updateTicket(ticket.id, { comments });
+  }
+
+  updatePrLink(link: string): void {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    this.updateTicket(ticket.id, { prLink: link });
+  }
+
+  addBugLink(link: string): void {
+    const trimmed = link.trim();
+    const ticket = this.selectedTicket();
+    if (!trimmed || !ticket) return;
+    this.updateTicket(ticket.id, { bugReportLinks: [...(ticket.bugReportLinks ?? []), trimmed] });
+  }
+
+  removeBugLink(index: number): void {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    const links = [...(ticket.bugReportLinks ?? [])];
+    links.splice(index, 1);
+    this.updateTicket(ticket.id, { bugReportLinks: links });
+  }
+
+  updateTimeSpent(minutes: number): void {
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    this.updateTicket(ticket.id, { timeSpentMinutes: Math.max(0, Math.round(minutes) || 0) });
+  }
+
+  openReleaseModal(): void {
+    this.releaseForm.set({
+      version: this.suggestNextVersion(),
+      nextSprint: `Sprint ${this.sprintNumber() + 1}`,
+    });
+    this.releaseModalOpen.set(true);
+  }
+
+  closeReleaseModal(): void {
+    this.releaseModalOpen.set(false);
+  }
+
+  updateReleaseVersion(version: string): void {
+    this.releaseForm.update((f) => ({ ...f, version }));
+  }
+
+  updateReleaseNextSprint(nextSprint: string): void {
+    this.releaseForm.update((f) => ({ ...f, nextSprint }));
+  }
+
+  async confirmRelease(): Promise<void> {
+    const version = this.releaseForm().version.trim();
+    if (!version || !this.db) return;
+    const nextSprintLabel = this.releaseForm().nextSprint.trim() || `Sprint ${this.sprintNumber() + 1}`;
+    const doneTickets = this.doneList();
+    const projectId = this.project();
+
+    this.releaseModalOpen.set(false);
+    try {
+      const batch = writeBatch(this.db);
+      for (const ticket of doneTickets) {
+        batch.update(doc(this.db, 'projects', projectId, 'tickets', ticket.id), { status: 'resolved', version });
+      }
+      batch.set(
+        doc(this.db, 'projects', projectId),
+        { sprintNumber: this.sprintNumber() + 1, sprintName: nextSprintLabel },
+        { merge: true },
+      );
+      await batch.commit();
+      this.showToast(`🚀 ${version} publiée · ${doneTickets.length} ticket(s) · ${nextSprintLabel} démarré`);
+    } catch {
+      this.showToast('⚠️ Échec de la publication');
+    }
+  }
+
+  private suggestNextVersion(): string {
+    const versions = this.resolvedList()
+      .map((t) => t.version)
+      .filter((v): v is string => !!v)
+      .sort()
+      .reverse();
+    const latest = versions[0];
+    const match = latest?.match(/v(\d+)\.(\d+)\.(\d+)/);
+    if (!match) return 'v1.0.0';
+    return `v${match[1]}.${Number(match[2]) + 1}.0`;
   }
 
   private updateTicket(id: string, changes: Partial<Ticket>): void {
@@ -210,7 +331,20 @@ export class TicketStore {
     return collection(this.db!, 'projects', projectId, 'tickets');
   }
 
-  private subscribeToProject(projectId: ProjectId): (() => void) | undefined {
+  private toTicket(projectId: ProjectId, docSnap: QueryDocumentSnapshot<DocumentData>): Ticket {
+    const data = docSnap.data() as Record<string, unknown>;
+    if (data['assignee'] !== undefined && data['createdBy'] === undefined) {
+      const ref = doc(this.db!, 'projects', projectId, 'tickets', docSnap.id);
+      updateDoc(ref, { createdBy: data['assignee'], assignee: deleteField() }).catch(() => {});
+    }
+    return {
+      ...data,
+      id: docSnap.id,
+      createdBy: (data['createdBy'] as string | undefined) ?? (data['assignee'] as string | undefined) ?? '?',
+    } as Ticket;
+  }
+
+  private subscribeToTickets(projectId: ProjectId): (() => void) | undefined {
     if (!this.db) return undefined;
 
     this.currentTickets.set([]);
@@ -223,9 +357,27 @@ export class TicketStore {
         void this.seedProject(projectId);
         return;
       }
-      this.currentTickets.set(
-        snapshot.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }) as Ticket),
-      );
+      this.currentTickets.set(snapshot.docs.map((docSnap) => this.toTicket(projectId, docSnap)));
+    });
+  }
+
+  private subscribeToProjectMeta(projectId: ProjectId): (() => void) | undefined {
+    if (!this.db) return undefined;
+
+    const ref = doc(this.db, 'projects', projectId);
+    let initialized = false;
+
+    return onSnapshot(ref, (snap) => {
+      if (!snap.exists()) {
+        if (!initialized) {
+          initialized = true;
+          void setDoc(ref, { sprintNumber: 1, sprintName: 'Sprint 1' });
+        }
+        return;
+      }
+      const data = snap.data();
+      this.sprintNumber.set((data['sprintNumber'] as number | undefined) ?? 1);
+      this.sprintName.set((data['sprintName'] as string | undefined) ?? 'Sprint 1');
     });
   }
 
@@ -234,10 +386,23 @@ export class TicketStore {
     const seedTickets = INITIAL_TICKETS[projectId];
     const batch = writeBatch(this.db);
     const now = Date.now();
-    seedTickets.forEach((seedTicket, index) => {
-      const { id, ...data } = seedTicket;
+    seedTickets.forEach((seedTicket) => {
+      const { id, createdMinutesAgo, comments, ...data } = seedTicket;
       const ref = doc(this.db!, 'projects', projectId, 'tickets', String(id));
-      batch.set(ref, { ...data, createdAt: Timestamp.fromMillis(now - index * 1000) });
+      const createdAt = Timestamp.fromMillis(now - createdMinutesAgo * 60_000);
+      batch.set(ref, {
+        ...data,
+        createdAt,
+        ...(comments
+          ? {
+              comments: comments.map((c) => ({
+                author: c.author,
+                text: c.text,
+                createdAt: Timestamp.fromMillis(now - c.minutesAgo * 60_000),
+              })),
+            }
+          : {}),
+      });
     });
     await batch.commit();
   }

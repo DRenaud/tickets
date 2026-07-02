@@ -20,19 +20,18 @@
 
 <div class="list">
   @for (item of store.backlogList(); track item.id) {
-    <div class="row">
+    <div class="row" (click)="store.openDetail(item.id)">
       <button
         type="button"
         class="checkbox"
         [class.checkbox-checked]="store.isSelected(item.id)"
         [attr.aria-pressed]="store.isSelected(item.id)"
         [attr.aria-label]="'Sélectionner ' + item.title"
-        (click)="store.toggleSelect(item.id)"
+        (click)="$event.stopPropagation(); store.toggleSelect(item.id)"
       >{{ store.isSelected(item.id) ? '✓' : '' }}</button>
       <div class="priority-dot" [class]="'prio-' + item.priority"></div>
       <div class="title">{{ item.title }}</div>
       <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).label }}</div>
-      <div class="assignee">{{ item.assignee }}</div>
     </div>
   }
 </div>

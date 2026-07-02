@@ -1,25 +1,30 @@
 <div class="toolbar">
-  <div class="title">Sprint actuel · {{ store.sprintCount() }} tickets</div>
+  <div class="title">{{ store.sprintName() }} · {{ store.sprintCount() }} tickets</div>
   <div class="spacer"></div>
   <button type="button" class="add-btn" (click)="store.togglePicker()">+ Ajouter depuis le backlog</button>
+  <button
+    type="button"
+    class="release-btn"
+    [class.release-btn-disabled]="store.doneList().length === 0"
+    (click)="store.doneList().length > 0 && store.openReleaseModal()"
+  >Release-it 🚀</button>
 </div>
 
 <div class="columns">
   <div class="column">
     <div class="column-title">À faire · {{ store.todoList().length }}</div>
     @for (item of store.todoList(); track item.id) {
-      <div class="card">
+      <div class="card" (click)="store.openDetail(item.id)">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
           <div class="spacer"></div>
-          <div class="assignee">{{ item.assignee }}</div>
           <button
             type="button"
             class="advance-btn advance-accent"
             [attr.aria-label]="'Passer ' + item.title + ' en cours'"
-            (click)="store.advanceTicket(item.id)"
+            (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
           >→</button>
         </div>
       </div>
@@ -29,18 +34,17 @@
   <div class="column">
     <div class="column-title">En cours · {{ store.inProgressList().length }}</div>
     @for (item of store.inProgressList(); track item.id) {
-      <div class="card">
+      <div class="card" (click)="store.openDetail(item.id)">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
           <div class="spacer"></div>
-          <div class="assignee">{{ item.assignee }}</div>
           <button
             type="button"
             class="advance-btn advance-mint"
-            [attr.aria-label]="'Résoudre ' + item.title"
-            (click)="store.advanceTicket(item.id)"
+            [attr.aria-label]="'Marquer ' + item.title + ' terminé'"
+            (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
           >✓</button>
         </div>
       </div>
@@ -48,11 +52,15 @@
   </div>
 
   <div class="column">
-    <div class="column-title">Résolu · {{ store.sprintResolvedList().length }}</div>
-    @for (item of store.sprintResolvedList(); track item.id) {
-      <div class="card card-resolved">
-        <div class="card-title card-title-done">{{ item.title }}</div>
-        <div class="version">✓ {{ item.version }}</div>
+    <div class="column-title">Terminé · {{ store.doneList().length }}</div>
+    @for (item of store.doneList(); track item.id) {
+      <div class="card card-done" (click)="store.openDetail(item.id)">
+        <div class="card-title">{{ item.title }}</div>
+        <div class="card-footer">
+          <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
+          <div class="spacer"></div>
+          <div class="ready-label">✓ prêt à release</div>
+        </div>
       </div>
     }
   </div>

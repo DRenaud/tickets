@@ -1,0 +1,37 @@
+@if (store.releaseModalOpen()) {
+  <div class="overlay" (click)="store.closeReleaseModal()">
+    <div class="modal" (click)="stopPropagation($event)">
+      <div class="modal-header">
+        <div class="title">Release-it 🚀</div>
+        <div class="spacer"></div>
+        <button type="button" class="close-btn" aria-label="Fermer" (click)="store.closeReleaseModal()">×</button>
+      </div>
+      <div class="hint">Les tickets "Terminé" seront marqués résolus sous cette version.</div>
+
+      <label class="field-label" for="release-version">Nom de la version</label>
+      <input
+        id="release-version"
+        [value]="store.releaseForm().version"
+        (input)="store.updateReleaseVersion($any($event.target).value)"
+        placeholder="v1.4.0"
+        class="text-input"
+      />
+
+      <label class="field-label" for="release-next-sprint">Nom du prochain sprint</label>
+      <input
+        id="release-next-sprint"
+        [value]="store.releaseForm().nextSprint"
+        (input)="store.updateReleaseNextSprint($any($event.target).value)"
+        placeholder="Sprint 5"
+        class="text-input"
+      />
+
+      <div class="actions">
+        <button type="button" class="cancel-btn" (click)="store.closeReleaseModal()">Annuler</button>
+        <button type="button" class="submit-btn" [disabled]="!store.releaseCanSubmit()" (click)="store.confirmRelease()">
+          Publier 🚀
+        </button>
+      </div>
+    </div>
+  </div>
+}

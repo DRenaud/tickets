@@ -22,6 +22,17 @@ export class AuthService {
   readonly initialized = signal(false);
   readonly isAuthenticated = computed(() => this.user() !== null);
 
+  readonly initials = computed(() => {
+    const user = this.user();
+    const source = user?.displayName?.trim() || user?.email?.trim() || '';
+    if (!source) return '?';
+    const parts = source.includes('@') ? [source.split('@')[0]] : source.split(/\s+/);
+    return parts
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  });
+
   constructor() {
     if (!this.firebaseApp.app) {
       this.initialized.set(true);

@@ -1,4 +1,5 @@
 import { Component, effect, inject, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppHeader } from '../../components/app-header/app-header';
 import { BacklogView } from '../../components/backlog-view/backlog-view';
 import { KanbanView } from '../../components/kanban-view/kanban-view';
@@ -23,6 +24,7 @@ import { TicketStore } from '../../services/ticket-store';
     TicketPicker,
     NewTicketModal,
     ToastNotification,
+    TranslocoPipe,
   ],
   templateUrl: './ticket-board-page.html',
   styleUrl: './ticket-board-page.css',

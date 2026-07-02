@@ -1,0 +1,113 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "close": "Close"
+  },
+  "header": {
+    "appName": "Tickets",
+    "newTicket": "+ New ticket",
+    "signOut": "Sign out"
+  },
+  "theme": {
+    "enableLight": "Switch to light theme",
+    "enableDark": "Switch to dark theme"
+  },
+  "lang": {
+    "label": "Language",
+    "fr": "FR",
+    "en": "EN",
+    "switchToFrench": "Passer en français",
+    "switchToEnglish": "Switch to English"
+  },
+  "tabs": {
+    "backlog": "Backlog",
+    "kanban": "Kanban",
+    "resolved": "Resolved"
+  },
+  "stats": {
+    "backlog": "backlog",
+    "sprint": "in sprint",
+    "resolved": "resolved"
+  },
+  "board": {
+    "greeting": {
+      "alveola": "Hi! Here's what's happening on Alvéola 👋",
+      "ludistes": "Hey Ludistes! A quick look at the tickets 🎲"
+    }
+  },
+  "priority": {
+    "all": "All",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low"
+  },
+  "category": {
+    "bug": "Bug",
+    "idea": "Idea",
+    "design": "Design",
+    "tech": "Technical"
+  },
+  "backlog": {
+    "selectedCount": "{{count}} selected",
+    "addToSprint": "Add to sprint →",
+    "selectTicket": "Select {{title}}"
+  },
+  "kanban": {
+    "sprintTitle": "Current sprint · {{count}} tickets",
+    "addFromBacklog": "+ Add from backlog",
+    "todo": "To do",
+    "inProgress": "In progress",
+    "resolved": "Resolved",
+    "moveToInProgress": "Move {{title}} to in progress",
+    "resolveTicket": "Resolve {{title}}"
+  },
+  "resolved": {
+    "ticketCount": "{{count}} tickets"
+  },
+  "picker": {
+    "title": "Add from backlog",
+    "addToSprint": "Add {{title}} to sprint"
+  },
+  "newTicket": {
+    "title": "New ticket",
+    "fieldTitle": "Title",
+    "titlePlaceholder": "The button is misbehaving…",
+    "description": "Description",
+    "descriptionPlaceholder": "Details, steps to reproduce…",
+    "priority": "Priority",
+    "category": "Category",
+    "submit": "Create ticket 🚀"
+  },
+  "login": {
+    "headingSignin": "Welcome back",
+    "headingSignup": "Create an account",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "loading": "One moment…",
+    "signIn": "Sign in",
+    "signUp": "Create my account",
+    "or": "or",
+    "google": "Continue with Google",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "errors": {
+      "invalidEmail": "Invalid email address.",
+      "userDisabled": "This account has been disabled.",
+      "userNotFound": "No account matches this email.",
+      "wrongPassword": "Incorrect password.",
+      "invalidCredential": "Incorrect email or password.",
+      "emailInUse": "An account already exists with this email.",
+      "weakPassword": "Password too weak (6 characters minimum).",
+      "popupClosed": "Google window closed before sign-in completed.",
+      "network": "Network problem, please try again.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "toast": {
+    "resolved": "🎉 Resolved — {{title}}",
+    "created": "✨ Ticket created",
+    "createFailed": "⚠️ Failed to create ticket",
+    "updateFailed": "⚠️ Update failed"
+  }
+}

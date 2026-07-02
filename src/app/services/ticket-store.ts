@@ -14,8 +14,8 @@ import {
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { CATEGORY_META, GREETINGS, INITIAL_TICKETS, PROJECTS } from '../data/tickets-seed';
-import { Category, NewTicketForm, PriorityFilter, ProjectId, Tab, Ticket } from '../models/ticket.model';
+import { CATEGORY_META, INITIAL_TICKETS, PROJECTS } from '../data/tickets-seed';
+import { Category, NewTicketForm, PriorityFilter, ProjectId, Tab, Ticket, ToastMessage } from '../models/ticket.model';
 import { getTheme } from '../theme/theme';
 import { AuthService } from './auth-service';
 import { FirebaseAppService } from './firebase-app';
@@ -32,7 +32,7 @@ export class TicketStore {
   readonly newTicketOpen = signal(false);
   readonly selectedBacklog = signal<ReadonlySet<string>>(new Set());
   readonly expandedVersions = signal<Record<string, boolean>>({ 'v1.3.0': true, 'v0.9.0': true });
-  readonly toast = signal<string | null>(null);
+  readonly toast = signal<ToastMessage | null>(null);
 
   private readonly db: Firestore | null;
   private readonly currentTickets = signal<Ticket[]>([]);
@@ -55,7 +55,6 @@ export class TicketStore {
   }
 
   readonly theme = computed(() => getTheme(this.dark()));
-  readonly greeting = computed(() => GREETINGS[this.project()]);
 
   readonly allBacklogList = computed(() => this.currentTickets().filter((t) => t.status === 'backlog'));
   readonly backlogList = computed(() => {
@@ -86,9 +85,9 @@ export class TicketStore {
   });
 
   readonly stats = computed(() => [
-    { key: 'backlog', label: 'backlog', value: this.allBacklogList().length },
-    { key: 'sprint', label: 'en sprint', value: this.todoList().length + this.inProgressList().length },
-    { key: 'resolved', label: 'résolus', value: this.resolvedList().length },
+    { key: 'backlog', labelKey: 'stats.backlog', value: this.allBacklogList().length },
+    { key: 'sprint', labelKey: 'stats.sprint', value: this.todoList().length + this.inProgressList().length },
+    { key: 'resolved', labelKey: 'stats.resolved', value: this.resolvedList().length },
   ]);
 
   readonly selectedCount = computed(() => this.selectedBacklog().size);
@@ -163,12 +162,12 @@ export class TicketStore {
       this.updateTicket(id, { status: 'inprogress' });
     } else if (ticket.status === 'inprogress') {
       this.updateTicket(id, { status: 'resolved', version: 'v1.3.0' });
-      this.showToast('🎉 Résolu — ' + ticket.title);
+      this.showToast('toast.resolved', { title: ticket.title });
     }
   }
 
-  showToast(msg: string): void {
-    this.toast.set(msg);
+  showToast(key: string, params?: Record<string, string>): void {
+    this.toast.set({ key, params });
     clearTimeout(this.toastTimer);
     this.toastTimer = setTimeout(() => this.toast.set(null), 2600);
   }
@@ -194,16 +193,16 @@ export class TicketStore {
         assignee: 'FL',
         createdAt: serverTimestamp(),
       });
-      this.showToast('✨ Ticket créé');
+      this.showToast('toast.created');
     } catch {
-      this.showToast("⚠️ Échec de création du ticket");
+      this.showToast('toast.createFailed');
     }
   }
 
   private updateTicket(id: string, changes: Partial<Ticket>): void {
     if (!this.db) return;
     const ref = doc(this.db, 'projects', this.project(), 'tickets', id);
-    updateDoc(ref, changes).catch(() => this.showToast('⚠️ Échec de la mise à jour'));
+    updateDoc(ref, changes).catch(() => this.showToast('toast.updateFailed'));
   }
 
   private ticketsCollection(projectId: ProjectId): CollectionReference {

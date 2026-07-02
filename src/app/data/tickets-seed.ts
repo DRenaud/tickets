@@ -5,16 +5,11 @@ export const PROJECTS: Project[] = [
   { id: 'ludistes', label: 'Ludistes Charentais' },
 ];
 
-export const GREETINGS: Record<ProjectId, string> = {
-  alveola: "Salut ! Voici ce qu'il se passe sur Alvéola 👋",
-  ludistes: "Coucou les ludistes ! Un coup d'œil sur les tickets 🎲",
-};
-
-export const CATEGORY_META: Record<Category, { emoji: string; label: string }> = {
-  bug: { emoji: '🐛', label: 'Bug' },
-  idea: { emoji: '💡', label: 'Idée' },
-  design: { emoji: '🎨', label: 'Design' },
-  tech: { emoji: '⚙️', label: 'Technique' },
+export const CATEGORY_META: Record<Category, { emoji: string; labelKey: string }> = {
+  bug: { emoji: '🐛', labelKey: 'category.bug' },
+  idea: { emoji: '💡', labelKey: 'category.idea' },
+  design: { emoji: '🎨', labelKey: 'category.design' },
+  tech: { emoji: '⚙️', labelKey: 'category.tech' },
 };
 
 export const INITIAL_TICKETS: Record<ProjectId, SeedTicket[]> = {

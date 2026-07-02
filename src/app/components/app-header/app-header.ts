@@ -1,11 +1,13 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '../../services/auth-service';
 import { TicketStore } from '../../services/ticket-store';
+import { LanguageSwitcher } from '../language-switcher/language-switcher';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink],
+  imports: [RouterLink, TranslocoPipe, LanguageSwitcher],
   templateUrl: './app-header.html',
   styleUrl: './app-header.css',
 })

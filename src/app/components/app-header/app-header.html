@@ -1,6 +1,6 @@
 <div class="header">
   <div class="logo">
-    <span>🎫</span><span>Tickets</span>
+    <span>🎫</span><span>{{ 'header.appName' | transloco }}</span>
   </div>
 
   <div class="project-switcher">
@@ -24,14 +24,22 @@
     }
   </div>
 
+  <app-language-switcher />
+
   <button
     type="button"
     class="theme-toggle"
-    [attr.aria-label]="store.dark() ? 'Activer le thème clair' : 'Activer le thème sombre'"
+    [attr.aria-label]="(store.dark() ? 'theme.enableLight' : 'theme.enableDark') | transloco"
     (click)="store.toggleDark()"
   >{{ store.dark() ? '🌙' : '☀️' }}</button>
 
-  <button type="button" class="new-ticket" (click)="store.openNewTicket()">+ Nouveau ticket</button>
+  <button type="button" class="new-ticket" (click)="store.openNewTicket()">{{ 'header.newTicket' | transloco }}</button>
 
-  <button type="button" class="avatar" title="Se déconnecter" (click)="logout()">{{ initials() }}</button>
+  <button
+    type="button"
+    class="avatar"
+    [attr.title]="'header.signOut' | transloco"
+    [attr.aria-label]="'header.signOut' | transloco"
+    (click)="logout()"
+  >{{ initials() }}</button>
 </div>

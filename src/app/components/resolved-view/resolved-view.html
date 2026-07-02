@@ -10,7 +10,7 @@
         <div class="chevron">{{ group.expanded ? '▾' : '▸' }}</div>
         <div class="version">{{ group.version }}</div>
         <div class="spacer"></div>
-        <div class="count">{{ group.tickets.length }} tickets</div>
+        <div class="count">{{ 'resolved.ticketCount' | transloco: { count: group.tickets.length } }}</div>
       </button>
       @if (group.expanded) {
         <div class="group-body">
@@ -18,7 +18,7 @@
             <div class="row">
               <div class="check">✓</div>
               <div class="title">{{ item.title }}</div>
-              <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).label }}</div>
+              <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).labelKey | transloco }}</div>
               <div class="assignee">{{ item.assignee }}</div>
             </div>
           }

@@ -7,6 +7,6 @@
       [class.tab-active]="store.tab() === tab.key"
       [attr.aria-selected]="store.tab() === tab.key"
       (click)="store.setTab(tab.key)"
-    >{{ tab.label }}</button>
+    >{{ tab.labelKey | transloco }}</button>
   }
 </div>

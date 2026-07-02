@@ -51,6 +51,6 @@ export function priorityColor(theme: Theme, priority: 'low' | 'medium' | 'high')
   return priority === 'high' ? theme.coral : priority === 'medium' ? theme.amber : theme.mint;
 }
 
-export function priorityLabel(priority: 'low' | 'medium' | 'high'): string {
-  return priority === 'high' ? 'Haute' : priority === 'medium' ? 'Moyenne' : 'Basse';
+export function priorityLabelKey(priority: 'low' | 'medium' | 'high'): string {
+  return `priority.${priority}`;
 }

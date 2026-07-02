@@ -25,6 +25,11 @@ export interface Project {
   label: string;
 }
 
+export interface ToastMessage {
+  key: string;
+  params?: Record<string, string>;
+}
+
 export interface NewTicketForm {
   title: string;
   description: string;

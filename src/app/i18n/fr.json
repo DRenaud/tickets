@@ -1,0 +1,149 @@
+{
+  "common": {
+    "cancel": "Annuler",
+    "close": "Fermer"
+  },
+  "header": {
+    "appName": "Tickets",
+    "newTicket": "+ Nouveau ticket",
+    "signOut": "Se déconnecter"
+  },
+  "theme": {
+    "enableLight": "Activer le thème clair",
+    "enableDark": "Activer le thème sombre"
+  },
+  "lang": {
+    "label": "Langue",
+    "fr": "FR",
+    "en": "EN",
+    "switchToFrench": "Passer en français",
+    "switchToEnglish": "Switch to English"
+  },
+  "tabs": {
+    "backlog": "Backlog",
+    "kanban": "Kanban",
+    "resolved": "Résolus"
+  },
+  "stats": {
+    "backlog": "backlog",
+    "sprint": "en sprint",
+    "resolved": "résolus"
+  },
+  "board": {
+    "greeting": {
+      "alveola": "Salut ! Voici ce qu'il se passe sur Alvéola 👋",
+      "ludistes": "Coucou les ludistes ! Un coup d'œil sur les tickets 🎲"
+    }
+  },
+  "priority": {
+    "all": "Toutes",
+    "high": "Haute",
+    "medium": "Moyenne",
+    "low": "Basse"
+  },
+  "status": {
+    "backlog": "Backlog",
+    "todo": "À faire",
+    "inprogress": "En cours",
+    "done": "Terminé",
+    "resolved": "Résolu"
+  },
+  "category": {
+    "bug": "Bug",
+    "idea": "Idée",
+    "design": "Design",
+    "tech": "Technique"
+  },
+  "backlog": {
+    "selectedCount": "{{count}} sélectionné(s)",
+    "addToSprint": "Ajouter au sprint →",
+    "selectTicket": "Sélectionner {{title}}"
+  },
+  "kanban": {
+    "sprintTitle": "{{sprint}} · {{count}} tickets",
+    "addFromBacklog": "+ Ajouter depuis le backlog",
+    "releaseIt": "Release-it 🚀",
+    "readyToRelease": "✓ prêt à release",
+    "moveToInProgress": "Passer {{title}} en cours",
+    "markDone": "Marquer {{title}} terminé"
+  },
+  "resolved": {
+    "ticketCount": "{{count}} tickets"
+  },
+  "picker": {
+    "title": "Ajouter depuis le backlog",
+    "addToSprint": "Ajouter {{title}} au sprint"
+  },
+  "detail": {
+    "back": "← Retour",
+    "noDescription": "Pas de description pour le moment.",
+    "comments": "Commentaires",
+    "commentPlaceholder": "Écrire un commentaire…",
+    "send": "Envoyer",
+    "priority": "Priorité",
+    "category": "Catégorie",
+    "createdBy": "Créé par",
+    "createdOn": "Créé le",
+    "version": "Version",
+    "timeSpent": "Temps passé",
+    "minutes": "min",
+    "prLink": "Lien PR",
+    "bugReports": "Rapports de bug",
+    "bugLinkPlaceholder": "Lien du rapport (BGA…)",
+    "addBugReport": "Ajouter le rapport de bug",
+    "removeBugReport": "Supprimer le rapport de bug",
+    "moveToInProgress": "Passer en cours",
+    "markDone": "Marquer terminé"
+  },
+  "release": {
+    "title": "Release-it 🚀",
+    "hint": "Les tickets \"Terminé\" seront marqués résolus sous cette version.",
+    "versionLabel": "Nom de la version",
+    "nextSprintLabel": "Nom du prochain sprint",
+    "publish": "Publier 🚀"
+  },
+  "newTicket": {
+    "title": "Nouveau ticket",
+    "fieldTitle": "Titre",
+    "titlePlaceholder": "Le bouton fait n'importe quoi…",
+    "description": "Description",
+    "descriptionPlaceholder": "Détails, étapes pour reproduire…",
+    "priority": "Priorité",
+    "category": "Catégorie",
+    "submit": "Créer le ticket 🚀"
+  },
+  "login": {
+    "headingSignin": "De retour",
+    "headingSignup": "Créer un compte",
+    "email": "E-mail",
+    "emailPlaceholder": "toi@exemple.com",
+    "password": "Mot de passe",
+    "loading": "Un instant…",
+    "signIn": "Se connecter",
+    "signUp": "Créer mon compte",
+    "or": "ou",
+    "google": "Continuer avec Google",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "errors": {
+      "invalidEmail": "Adresse e-mail invalide.",
+      "userDisabled": "Ce compte a été désactivé.",
+      "userNotFound": "Aucun compte ne correspond à cet e-mail.",
+      "wrongPassword": "Mot de passe incorrect.",
+      "invalidCredential": "E-mail ou mot de passe incorrect.",
+      "emailInUse": "Un compte existe déjà avec cet e-mail.",
+      "weakPassword": "Mot de passe trop faible (6 caractères minimum).",
+      "popupClosed": "Fenêtre Google fermée avant la fin de la connexion.",
+      "network": "Problème réseau, réessaie.",
+      "unknown": "Une erreur est survenue. Réessaie."
+    }
+  },
+  "toast": {
+    "done": "✅ Terminé — {{title}}",
+    "created": "✨ Ticket créé",
+    "createFailed": "⚠️ Échec de création du ticket",
+    "updateFailed": "⚠️ Échec de la mise à jour",
+    "released": "🚀 {{version}} publiée · {{count}} ticket(s) · {{nextSprint}} démarré",
+    "releaseFailed": "⚠️ Échec de la publication"
+  }
+}

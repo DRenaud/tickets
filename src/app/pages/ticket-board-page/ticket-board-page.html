@@ -16,7 +16,7 @@
   <app-header />
 
   <div class="content">
-    <div class="greeting">{{ store.greeting() }}</div>
+    <div class="greeting">{{ ('board.greeting.' + store.project()) | transloco }}</div>
 
     @if (store.selectedTicketId()) {
       <app-ticket-detail-view />

@@ -1,38 +1,44 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { Timestamp } from 'firebase/firestore';
+import { AppLang, LocaleService } from '../../services/locale-service';
 import { TicketStore } from '../../services/ticket-store';
 import { formatDate, formatDateTime } from '../../theme/format-date';
-import { priorityLabel } from '../../theme/theme';
+import { priorityLabelKey } from '../../theme/theme';
 
 const STAGE_DEFS = [
-  { key: 'backlog', label: 'Backlog' },
-  { key: 'todo', label: 'À faire' },
-  { key: 'inprogress', label: 'En cours' },
-  { key: 'done', label: 'Terminé' },
-  { key: 'resolved', label: 'Résolu' },
+  { key: 'backlog', labelKey: 'status.backlog' },
+  { key: 'todo', labelKey: 'status.todo' },
+  { key: 'inprogress', labelKey: 'status.inprogress' },
+  { key: 'done', labelKey: 'status.done' },
+  { key: 'resolved', labelKey: 'status.resolved' },
 ] as const;
+
+const DATE_LOCALES: Record<AppLang, string> = { fr: 'fr-FR', en: 'en-US' };
 
 @Component({
   selector: 'app-ticket-detail-view',
+  imports: [TranslocoPipe],
   templateUrl: './ticket-detail-view.html',
   styleUrl: './ticket-detail-view.css',
 })
 export class TicketDetailView {
   protected readonly store = inject(TicketStore);
+  private readonly locale = inject(LocaleService);
   protected readonly ticket = this.store.selectedTicket;
 
   protected readonly newCommentText = signal('');
   protected readonly newBugLinkDraft = signal('');
 
-  protected readonly priorityLabel = priorityLabel;
-  protected readonly formatDate = formatDate;
-  protected readonly formatDateTime = formatDateTime;
+  protected readonly priorityLabelKey = priorityLabelKey;
+  private readonly dateLocale = computed(() => DATE_LOCALES[this.locale.lang()]);
 
   protected readonly stages = computed(() => {
     const ticket = this.ticket();
     if (!ticket) return [];
     const currentIndex = STAGE_DEFS.findIndex((s) => s.key === ticket.status);
     return STAGE_DEFS.map((stage, index) => ({
-      label: stage.label,
+      labelKey: stage.labelKey,
       passed: index <= currentIndex,
       lineActive: index < currentIndex,
     }));
@@ -43,9 +49,17 @@ export class TicketDetailView {
     return status === 'todo' || status === 'inprogress';
   });
   protected readonly canAddToSprint = computed(() => this.ticket()?.status === 'backlog');
-  protected readonly advanceLabel = computed(() =>
-    this.ticket()?.status === 'todo' ? 'Passer en cours' : 'Marquer terminé',
+  protected readonly advanceLabelKey = computed(() =>
+    this.ticket()?.status === 'todo' ? 'detail.moveToInProgress' : 'detail.markDone',
   );
+
+  formatDate(timestamp: Timestamp | undefined): string {
+    return formatDate(timestamp, this.dateLocale());
+  }
+
+  formatDateTime(timestamp: Timestamp | undefined): string {
+    return formatDateTime(timestamp, this.dateLocale());
+  }
 
   back(): void {
     this.store.closeDetail();

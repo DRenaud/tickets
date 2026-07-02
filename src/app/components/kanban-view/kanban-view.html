@@ -1,18 +1,18 @@
 <div class="toolbar">
-  <div class="title">{{ store.sprintName() }} · {{ store.sprintCount() }} tickets</div>
+  <div class="title">{{ 'kanban.sprintTitle' | transloco: { sprint: store.sprintName(), count: store.sprintCount() } }}</div>
   <div class="spacer"></div>
-  <button type="button" class="add-btn" (click)="store.togglePicker()">+ Ajouter depuis le backlog</button>
+  <button type="button" class="add-btn" (click)="store.togglePicker()">{{ 'kanban.addFromBacklog' | transloco }}</button>
   <button
     type="button"
     class="release-btn"
     [class.release-btn-disabled]="store.doneList().length === 0"
     (click)="store.doneList().length > 0 && store.openReleaseModal()"
-  >Release-it 🚀</button>
+  >{{ 'kanban.releaseIt' | transloco }}</button>
 </div>
 
 <div class="columns">
   <div class="column">
-    <div class="column-title">À faire · {{ store.todoList().length }}</div>
+    <div class="column-title">{{ 'status.todo' | transloco }} · {{ store.todoList().length }}</div>
     @for (item of store.todoList(); track item.id) {
       <div class="card" (click)="store.openDetail(item.id)">
         <div class="card-title">{{ item.title }}</div>
@@ -23,7 +23,7 @@
           <button
             type="button"
             class="advance-btn advance-accent"
-            [attr.aria-label]="'Passer ' + item.title + ' en cours'"
+            [attr.aria-label]="'kanban.moveToInProgress' | transloco: { title: item.title }"
             (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
           >→</button>
         </div>
@@ -32,7 +32,7 @@
   </div>
 
   <div class="column">
-    <div class="column-title">En cours · {{ store.inProgressList().length }}</div>
+    <div class="column-title">{{ 'status.inprogress' | transloco }} · {{ store.inProgressList().length }}</div>
     @for (item of store.inProgressList(); track item.id) {
       <div class="card" (click)="store.openDetail(item.id)">
         <div class="card-title">{{ item.title }}</div>
@@ -43,7 +43,7 @@
           <button
             type="button"
             class="advance-btn advance-mint"
-            [attr.aria-label]="'Marquer ' + item.title + ' terminé'"
+            [attr.aria-label]="'kanban.markDone' | transloco: { title: item.title }"
             (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
           >✓</button>
         </div>
@@ -52,14 +52,14 @@
   </div>
 
   <div class="column">
-    <div class="column-title">Terminé · {{ store.doneList().length }}</div>
+    <div class="column-title">{{ 'status.done' | transloco }} · {{ store.doneList().length }}</div>
     @for (item of store.doneList(); track item.id) {
       <div class="card card-done" (click)="store.openDetail(item.id)">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
           <div class="spacer"></div>
-          <div class="ready-label">✓ prêt à release</div>
+          <div class="ready-label">{{ 'kanban.readyToRelease' | transloco }}</div>
         </div>
       </div>
     }

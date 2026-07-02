@@ -43,6 +43,11 @@ export interface Project {
   label: string;
 }
 
+export interface ToastMessage {
+  key: string;
+  params?: Record<string, string | number>;
+}
+
 export interface NewTicketForm {
   title: string;
   description: string;

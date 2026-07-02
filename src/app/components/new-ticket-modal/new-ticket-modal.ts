@@ -1,5 +1,6 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Category, NewTicketForm, Priority } from '../../models/ticket.model';
 import { TicketStore } from '../../services/ticket-store';
 
@@ -9,7 +10,7 @@ function emptyForm(): NewTicketForm {
 
 @Component({
   selector: 'app-new-ticket-modal',
-  imports: [FormField],
+  imports: [FormField, TranslocoPipe],
   templateUrl: './new-ticket-modal.html',
   styleUrl: './new-ticket-modal.css',
 })
@@ -19,10 +20,10 @@ export class NewTicketModal {
   private readonly model = signal<NewTicketForm>(emptyForm());
   protected readonly ticketForm = form(this.model);
 
-  protected readonly priorityOptions: { key: Priority; label: string }[] = [
-    { key: 'low', label: 'Basse' },
-    { key: 'medium', label: 'Moyenne' },
-    { key: 'high', label: 'Haute' },
+  protected readonly priorityOptions: { key: Priority; labelKey: string }[] = [
+    { key: 'low', labelKey: 'priority.low' },
+    { key: 'medium', labelKey: 'priority.medium' },
+    { key: 'high', labelKey: 'priority.high' },
   ];
   protected readonly categoryOptions: Category[] = ['bug', 'idea', 'design', 'tech'];
 

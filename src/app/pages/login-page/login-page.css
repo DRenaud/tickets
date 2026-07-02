@@ -13,10 +13,16 @@
   padding: 24px;
 }
 
-.theme-toggle {
+.top-actions {
   position: absolute;
   top: 24px;
   right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.theme-toggle {
   width: 36px;
   height: 36px;
   border-radius: 50%;

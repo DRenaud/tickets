@@ -2,7 +2,7 @@
   @for (stat of store.stats(); track stat.key) {
     <div class="stat-card">
       <div class="stat-value" [class]="'stat-' + stat.key">{{ stat.value }}</div>
-      <div class="stat-label">{{ stat.label }}</div>
+      <div class="stat-label">{{ stat.labelKey | transloco }}</div>
     </div>
   }
 </div>

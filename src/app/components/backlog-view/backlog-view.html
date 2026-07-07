@@ -9,7 +9,7 @@
   }
 </div>
 
-@if (store.hasSelection()) {
+@if (store.isAdmin() && store.hasSelection()) {
   <div class="selection-banner">
     <div class="selection-count">{{ 'backlog.selectedCount' | transloco: { count: store.selectedCount() } }}</div>
     <div class="spacer"></div>
@@ -21,17 +21,27 @@
 <div class="list">
   @for (item of store.backlogList(); track item.id) {
     <div class="row" (click)="store.openDetail(item.id)">
-      <button
-        type="button"
-        class="checkbox"
-        [class.checkbox-checked]="store.isSelected(item.id)"
-        [attr.aria-pressed]="store.isSelected(item.id)"
-        [attr.aria-label]="'backlog.selectTicket' | transloco: { title: item.title }"
-        (click)="$event.stopPropagation(); store.toggleSelect(item.id)"
-      >{{ store.isSelected(item.id) ? '✓' : '' }}</button>
+      @if (store.isAdmin()) {
+        <button
+          type="button"
+          class="checkbox"
+          [class.checkbox-checked]="store.isSelected(item.id)"
+          [attr.aria-pressed]="store.isSelected(item.id)"
+          [attr.aria-label]="'backlog.selectTicket' | transloco: { title: item.title }"
+          (click)="$event.stopPropagation(); store.toggleSelect(item.id)"
+        >{{ store.isSelected(item.id) ? '✓' : '' }}</button>
+      }
       <div class="priority-dot" [class]="'prio-' + item.priority"></div>
       <div class="title">{{ item.title }}</div>
       <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).labelKey | transloco }}</div>
+      <button
+        type="button"
+        class="upvote-btn"
+        [class.upvote-btn-active]="store.hasUpvoted(item)"
+        [attr.aria-pressed]="store.hasUpvoted(item)"
+        [attr.aria-label]="'backlog.upvote' | transloco: { title: item.title }"
+        (click)="$event.stopPropagation(); store.toggleUpvote(item.id)"
+      >▲ {{ store.upvoteCount(item) }}</button>
     </div>
   }
 </div>

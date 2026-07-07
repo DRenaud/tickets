@@ -12,6 +12,8 @@ import {
 } from 'firebase/auth';
 import { FirebaseAppService } from './firebase-app';
 
+const ADMIN_EMAIL = 'contact@damien-renaud.com';
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly firebaseApp = inject(FirebaseAppService);
@@ -21,6 +23,7 @@ export class AuthService {
   readonly user = signal<User | null>(null);
   readonly initialized = signal(false);
   readonly isAuthenticated = computed(() => this.user() !== null);
+  readonly isAdmin = computed(() => this.user()?.email === ADMIN_EMAIL);
 
   readonly initials = computed(() => {
     const user = this.user();

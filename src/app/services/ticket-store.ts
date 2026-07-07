@@ -18,7 +18,7 @@ import {
   updateDoc,
   writeBatch,
 } from 'firebase/firestore';
-import { CATEGORY_META, INITIAL_TICKETS, PROJECTS } from '../data/tickets-seed';
+import { CATEGORY_META, PROJECTS } from '../data/tickets-seed';
 import { Category, NewTicketForm, PriorityFilter, ProjectId, Tab, Ticket, ToastMessage } from '../models/ticket.model';
 import { getTheme } from '../theme/theme';
 import { AuthService } from './auth-service';
@@ -28,6 +28,7 @@ import { FirebaseAppService } from './firebase-app';
 export class TicketStore {
   readonly projects = PROJECTS;
   private readonly auth = inject(AuthService);
+  readonly isAdmin = this.auth.isAdmin;
 
   readonly dark = signal(true);
   readonly project = signal<ProjectId>('alveola');
@@ -164,6 +165,10 @@ export class TicketStore {
   }
 
   addSelectedToSprint(): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const ids = this.selectedBacklog();
     this.selectedBacklog.set(new Set());
     for (const id of ids) {
@@ -172,10 +177,18 @@ export class TicketStore {
   }
 
   addFromBacklogToSprint(id: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     this.updateTicket(id, { status: 'todo' });
   }
 
   advanceTicket(id: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const ticket = this.currentTickets().find((t) => t.id === id);
     if (!ticket) return;
     if (ticket.status === 'todo') {
@@ -236,13 +249,39 @@ export class TicketStore {
     this.updateTicket(ticket.id, { comments });
   }
 
+  upvoteCount(ticket: Ticket): number {
+    return ticket.upvotes?.length ?? 0;
+  }
+
+  hasUpvoted(ticket: Ticket): boolean {
+    return !!ticket.upvotes?.includes(this.auth.user()?.uid ?? '');
+  }
+
+  toggleUpvote(id: string): void {
+    const uid = this.auth.user()?.uid;
+    if (!uid) return;
+    const ticket = this.currentTickets().find((t) => t.id === id);
+    if (!ticket) return;
+    const upvotes = ticket.upvotes ?? [];
+    const next = upvotes.includes(uid) ? upvotes.filter((u) => u !== uid) : [...upvotes, uid];
+    this.updateTicket(id, { upvotes: next });
+  }
+
   updatePrLink(link: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const ticket = this.selectedTicket();
     if (!ticket) return;
     this.updateTicket(ticket.id, { prLink: link });
   }
 
   addBugLink(link: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const trimmed = link.trim();
     const ticket = this.selectedTicket();
     if (!trimmed || !ticket) return;
@@ -250,6 +289,10 @@ export class TicketStore {
   }
 
   removeBugLink(index: number): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const ticket = this.selectedTicket();
     if (!ticket) return;
     const links = [...(ticket.bugReportLinks ?? [])];
@@ -258,12 +301,20 @@ export class TicketStore {
   }
 
   updateTimeSpent(minutes: number): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const ticket = this.selectedTicket();
     if (!ticket) return;
     this.updateTicket(ticket.id, { timeSpentMinutes: Math.max(0, Math.round(minutes) || 0) });
   }
 
   openReleaseModal(): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     this.releaseForm.set({
       version: this.suggestNextVersion(),
       nextSprint: `Sprint ${this.sprintNumber() + 1}`,
@@ -284,6 +335,10 @@ export class TicketStore {
   }
 
   async confirmRelease(): Promise<void> {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
     const version = this.releaseForm().version.trim();
     if (!version || !this.db) return;
     const nextSprintLabel = this.releaseForm().nextSprint.trim() || `Sprint ${this.sprintNumber() + 1}`;
@@ -351,15 +406,9 @@ export class TicketStore {
     if (!this.db) return undefined;
 
     this.currentTickets.set([]);
-    let seeded = false;
     const projectQuery = query(this.ticketsCollection(projectId), orderBy('createdAt', 'desc'));
 
     return onSnapshot(projectQuery, (snapshot) => {
-      if (snapshot.empty && !seeded) {
-        seeded = true;
-        void this.seedProject(projectId);
-        return;
-      }
       this.currentTickets.set(snapshot.docs.map((docSnap) => this.toTicket(projectId, docSnap)));
     });
   }
@@ -382,31 +431,5 @@ export class TicketStore {
       this.sprintNumber.set((data['sprintNumber'] as number | undefined) ?? 1);
       this.sprintName.set((data['sprintName'] as string | undefined) ?? 'Sprint 1');
     });
-  }
-
-  private async seedProject(projectId: ProjectId): Promise<void> {
-    if (!this.db) return;
-    const seedTickets = INITIAL_TICKETS[projectId];
-    const batch = writeBatch(this.db);
-    const now = Date.now();
-    seedTickets.forEach((seedTicket) => {
-      const { id, createdMinutesAgo, comments, ...data } = seedTicket;
-      const ref = doc(this.db!, 'projects', projectId, 'tickets', String(id));
-      const createdAt = Timestamp.fromMillis(now - createdMinutesAgo * 60_000);
-      batch.set(ref, {
-        ...data,
-        createdAt,
-        ...(comments
-          ? {
-              comments: comments.map((c) => ({
-                author: c.author,
-                text: c.text,
-                createdAt: Timestamp.fromMillis(now - c.minutesAgo * 60_000),
-              })),
-            }
-          : {}),
-      });
-    });
-    await batch.commit();
   }
 }

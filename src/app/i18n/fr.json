@@ -57,7 +57,8 @@
   "backlog": {
     "selectedCount": "{{count}} sélectionné(s)",
     "addToSprint": "Ajouter au sprint →",
-    "selectTicket": "Sélectionner {{title}}"
+    "selectTicket": "Sélectionner {{title}}",
+    "upvote": "Voter pour {{title}}"
   },
   "kanban": {
     "sprintTitle": "{{sprint}} · {{count}} tickets",
@@ -93,7 +94,8 @@
     "addBugReport": "Ajouter le rapport de bug",
     "removeBugReport": "Supprimer le rapport de bug",
     "moveToInProgress": "Passer en cours",
-    "markDone": "Marquer terminé"
+    "markDone": "Marquer terminé",
+    "upvote": "Voter"
   },
   "release": {
     "title": "Release-it 🚀",
@@ -144,6 +146,7 @@
     "createFailed": "⚠️ Échec de création du ticket",
     "updateFailed": "⚠️ Échec de la mise à jour",
     "released": "🚀 {{version}} publiée · {{count}} ticket(s) · {{nextSprint}} démarré",
-    "releaseFailed": "⚠️ Échec de la publication"
+    "releaseFailed": "⚠️ Échec de la publication",
+    "notAuthorized": "⛔ Tu n'as pas la permission de faire ça"
   }
 }

@@ -28,14 +28,7 @@ export interface Ticket {
   timeSpentMinutes?: number;
   comments?: Comment[];
   attachments?: string[];
-}
-
-/** Ticket seed shape used only to populate a project's Firestore collection the first time it's empty. */
-export interface SeedTicket extends Omit<Ticket, 'id' | 'createdAt' | 'comments'> {
-  id: number;
-  /** Minutes before "now" this ticket was created — only used to derive a real createdAt at seed time. */
-  createdMinutesAgo: number;
-  comments?: { author: string; text: string; minutesAgo: number }[];
+  upvotes?: string[];
 }
 
 export interface Project {

@@ -1,13 +1,15 @@
 <div class="toolbar">
   <div class="title">{{ 'kanban.sprintTitle' | transloco: { sprint: store.sprintName(), count: store.sprintCount() } }}</div>
   <div class="spacer"></div>
-  <button type="button" class="add-btn" (click)="store.togglePicker()">{{ 'kanban.addFromBacklog' | transloco }}</button>
-  <button
-    type="button"
-    class="release-btn"
-    [class.release-btn-disabled]="store.doneList().length === 0"
-    (click)="store.doneList().length > 0 && store.openReleaseModal()"
-  >{{ 'kanban.releaseIt' | transloco }}</button>
+  @if (store.isAdmin()) {
+    <button type="button" class="add-btn" (click)="store.togglePicker()">{{ 'kanban.addFromBacklog' | transloco }}</button>
+    <button
+      type="button"
+      class="release-btn"
+      [class.release-btn-disabled]="store.doneList().length === 0"
+      (click)="store.doneList().length > 0 && store.openReleaseModal()"
+    >{{ 'kanban.releaseIt' | transloco }}</button>
+  }
 </div>
 
 <div class="columns">
@@ -20,12 +22,14 @@
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
           <div class="spacer"></div>
-          <button
-            type="button"
-            class="advance-btn advance-accent"
-            [attr.aria-label]="'kanban.moveToInProgress' | transloco: { title: item.title }"
-            (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
-          >→</button>
+          @if (store.isAdmin()) {
+            <button
+              type="button"
+              class="advance-btn advance-accent"
+              [attr.aria-label]="'kanban.moveToInProgress' | transloco: { title: item.title }"
+              (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
+            >→</button>
+          }
         </div>
       </div>
     }
@@ -40,12 +44,14 @@
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>
           <div class="spacer"></div>
-          <button
-            type="button"
-            class="advance-btn advance-mint"
-            [attr.aria-label]="'kanban.markDone' | transloco: { title: item.title }"
-            (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
-          >✓</button>
+          @if (store.isAdmin()) {
+            <button
+              type="button"
+              class="advance-btn advance-mint"
+              [attr.aria-label]="'kanban.markDone' | transloco: { title: item.title }"
+              (click)="$event.stopPropagation(); store.advanceTicket(item.id)"
+            >✓</button>
+          }
         </div>
       </div>
     }

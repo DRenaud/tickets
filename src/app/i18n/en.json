@@ -57,7 +57,8 @@
   "backlog": {
     "selectedCount": "{{count}} selected",
     "addToSprint": "Add to sprint →",
-    "selectTicket": "Select {{title}}"
+    "selectTicket": "Select {{title}}",
+    "upvote": "Upvote {{title}}"
   },
   "kanban": {
     "sprintTitle": "{{sprint}} · {{count}} tickets",
@@ -93,7 +94,8 @@
     "addBugReport": "Add bug report",
     "removeBugReport": "Remove bug report",
     "moveToInProgress": "Move to in progress",
-    "markDone": "Mark as done"
+    "markDone": "Mark as done",
+    "upvote": "Upvote"
   },
   "release": {
     "title": "Release-it 🚀",
@@ -144,6 +146,7 @@
     "createFailed": "⚠️ Failed to create ticket",
     "updateFailed": "⚠️ Update failed",
     "released": "🚀 {{version}} released · {{count}} ticket(s) · {{nextSprint}} started",
-    "releaseFailed": "⚠️ Release failed"
+    "releaseFailed": "⚠️ Release failed",
+    "notAuthorized": "⛔ You don't have permission to do this"
   }
 }

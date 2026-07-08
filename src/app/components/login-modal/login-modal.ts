@@ -1,9 +1,7 @@
 import { Component, inject, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
-import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { FirebaseError } from 'firebase/app';
-import { LanguageSwitcher } from '../../components/language-switcher/language-switcher';
 import { AuthService } from '../../services/auth-service';
 import { TicketStore } from '../../services/ticket-store';
 
@@ -34,15 +32,14 @@ function describeError(error: unknown): string {
 }
 
 @Component({
-  selector: 'app-login-page',
-  imports: [FormField, TranslocoPipe, LanguageSwitcher],
-  templateUrl: './login-page.html',
-  styleUrl: './login-page.css',
+  selector: 'app-login-modal',
+  imports: [FormField, TranslocoPipe],
+  templateUrl: './login-modal.html',
+  styleUrl: './login-modal.css',
 })
-export class LoginPage {
+export class LoginModal {
   protected readonly store = inject(TicketStore);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   protected readonly mode = signal<Mode>('signin');
   protected readonly loading = signal(false);
@@ -54,6 +51,14 @@ export class LoginPage {
   toggleMode(): void {
     this.mode.set(this.mode() === 'signin' ? 'signup' : 'signin');
     this.errorKey.set(null);
+  }
+
+  close(): void {
+    this.store.closeLoginModal();
+  }
+
+  stopPropagation(event: Event): void {
+    event.stopPropagation();
   }
 
   async submit(): Promise<void> {
@@ -68,7 +73,7 @@ export class LoginPage {
       } else {
         await this.auth.signUpWithEmail(email.trim(), password);
       }
-      await this.router.navigateByUrl('/alveola');
+      this.store.onLoginSuccess();
     } catch (error) {
       this.errorKey.set(describeError(error));
     } finally {
@@ -82,7 +87,7 @@ export class LoginPage {
     this.errorKey.set(null);
     try {
       await this.auth.signInWithGoogle();
-      await this.router.navigateByUrl('/alveola');
+      this.store.onLoginSuccess();
     } catch (error) {
       this.errorKey.set(describeError(error));
     } finally {

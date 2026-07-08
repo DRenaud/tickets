@@ -6,6 +6,7 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   onAuthStateChanged,
+  signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut as firebaseSignOut,
@@ -23,6 +24,8 @@ export class AuthService {
   readonly user = signal<User | null>(null);
   readonly initialized = signal(false);
   readonly isAuthenticated = computed(() => this.user() !== null);
+  readonly isAnonymous = computed(() => this.user()?.isAnonymous === true);
+  readonly isRealUser = computed(() => this.isAuthenticated() && !this.isAnonymous());
   readonly isAdmin = computed(() => this.user()?.email === ADMIN_EMAIL);
 
   readonly initials = computed(() => {
@@ -47,6 +50,19 @@ export class AuthService {
 
     this.readyPromise = new Promise((resolve) => {
       onAuthStateChanged(this.auth!, (user) => {
+        if (!user) {
+          // No session yet: start an anonymous one so browsing works without
+          // an account. Wait for the next callback (with the anonymous user)
+          // before resolving, to avoid a brief "signed out" flash.
+          signInAnonymously(this.auth!).catch(() => {
+            this.user.set(null);
+            if (!this.initialized()) {
+              this.initialized.set(true);
+              resolve();
+            }
+          });
+          return;
+        }
         this.user.set(user);
         if (!this.initialized()) {
           this.initialized.set(true);

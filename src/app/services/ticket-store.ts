@@ -30,6 +30,7 @@ export class TicketStore {
   readonly projects = PROJECTS;
   private readonly auth = inject(AuthService);
   readonly isAdmin = this.auth.isAdmin;
+  readonly isRealUser = this.auth.isRealUser;
 
   readonly dark = signal(true);
   readonly project = signal<ProjectId>('alveola');
@@ -46,10 +47,12 @@ export class TicketStore {
   readonly sprintNumber = signal(1);
   readonly releaseModalOpen = signal(false);
   readonly releaseForm = signal<{ version: string; nextSprint: string }>({ version: '', nextSprint: '' });
+  readonly loginModalOpen = signal(false);
 
   private readonly db: Firestore | null;
   private readonly currentTickets = signal<Ticket[]>([]);
   private toastTimer?: ReturnType<typeof setTimeout>;
+  private pendingAction: (() => void) | null = null;
 
   constructor() {
     const firebaseApp = inject(FirebaseAppService);
@@ -121,6 +124,29 @@ export class TicketStore {
 
   isSelected(id: string): boolean {
     return this.selectedBacklog().has(id);
+  }
+
+  private requireRealUser(retry: () => void): boolean {
+    if (this.auth.isRealUser()) return true;
+    this.pendingAction = retry;
+    this.loginModalOpen.set(true);
+    return false;
+  }
+
+  openLoginModal(): void {
+    this.loginModalOpen.set(true);
+  }
+
+  closeLoginModal(): void {
+    this.loginModalOpen.set(false);
+    this.pendingAction = null;
+  }
+
+  onLoginSuccess(): void {
+    this.loginModalOpen.set(false);
+    const action = this.pendingAction;
+    this.pendingAction = null;
+    action?.();
   }
 
   toggleDark(): void {
@@ -215,6 +241,7 @@ export class TicketStore {
   }
 
   async submitNewTicket(form: NewTicketForm): Promise<void> {
+    if (!this.requireRealUser(() => this.submitNewTicket(form))) return;
     const title = form.title.trim();
     if (!title || !this.db) return;
     this.newTicketOpen.set(false);
@@ -243,6 +270,7 @@ export class TicketStore {
   }
 
   addComment(text: string): void {
+    if (!this.requireRealUser(() => this.addComment(text))) return;
     const trimmed = text.trim();
     const ticket = this.selectedTicket();
     if (!trimmed || !ticket) return;
@@ -284,6 +312,7 @@ export class TicketStore {
   }
 
   toggleUpvote(id: string): void {
+    if (!this.requireRealUser(() => this.toggleUpvote(id))) return;
     const uid = this.auth.user()?.uid;
     if (!uid) return;
     const ticket = this.currentTickets().find((t) => t.id === id);

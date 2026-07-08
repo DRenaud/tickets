@@ -50,8 +50,13 @@ export class NewTicketModal {
 
   submit(): void {
     if (!this.canSubmit()) return;
+    const wasRealUser = this.store.isRealUser();
     this.store.submitNewTicket(this.model());
-    this.model.set(emptyForm());
+    // Only clear the draft if the write actually went through: if the user
+    // isn't a real account yet, submitNewTicket defers to the login modal
+    // and retries with this exact form once signed in — clearing here would
+    // visually "lose" the draft while it's still pending.
+    if (wasRealUser) this.model.set(emptyForm());
   }
 
   stopPropagation(event: Event): void {

@@ -11,6 +11,10 @@ service cloud.firestore {
       return isSignedIn() && request.auth.token.email == 'contact@damien-renaud.com';
     }
 
+    function isRealUser() {
+      return isSignedIn() && request.auth.token.firebase.sign_in_provider != 'anonymous';
+    }
+
     match /projects/{projectId} {
       allow read: if isSignedIn();
       // create: open to any signed-in user so the sprint-metadata doc can be
@@ -22,12 +26,12 @@ service cloud.firestore {
         allow read: if isSignedIn();
 
         allow create: if isAdmin()
-          || (isSignedIn()
+          || (isRealUser()
               && request.resource.data.status == 'backlog'
               && request.resource.data.createdBy is string);
 
         allow update: if isAdmin() || (
-          isSignedIn()
+          isRealUser()
           && resource.data.status == 'backlog'
           && request.resource.data.status == 'backlog'
           && request.resource.data.diff(resource.data).affectedKeys()

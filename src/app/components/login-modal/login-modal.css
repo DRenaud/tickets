@@ -1,69 +1,57 @@
-.page {
-  width: 100%;
-  min-height: 100vh;
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'IBM Plex Sans', sans-serif;
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  transition: background 0.25s ease, color 0.25s ease;
-  box-sizing: border-box;
-  padding: 24px;
+  z-index: 50;
 }
 
-.top-actions {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.theme-toggle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border);
-  background: transparent;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.theme-toggle:hover {
-  background: var(--bg-hover);
-}
-
-.card {
+.modal {
   width: 380px;
-  max-width: 100%;
+  max-width: 90vw;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 32px 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  border-radius: 16px;
+  padding: 22px;
+  animation: modalIn 0.2s ease;
 }
 
-.logo {
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-family: 'Sora', sans-serif;
-  font-weight: 800;
-  font-size: 19px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
-.heading h1 {
+.title {
   font-family: 'Sora', sans-serif;
   font-weight: 700;
-  font-size: 22px;
-  margin: 0 0 6px;
+  font-size: 17px;
+  color: var(--text);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 18px;
+  color: var(--text-muted);
+  background: none;
+  border: none;
 }
 
 .error-banner {

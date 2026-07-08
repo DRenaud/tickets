@@ -68,8 +68,11 @@ export class TicketDetailView {
 
   submitComment(): void {
     if (!this.newCommentText().trim()) return;
+    const wasRealUser = this.store.isRealUser();
     this.store.addComment(this.newCommentText());
-    this.newCommentText.set('');
+    // Same reasoning as NewTicketModal.submit(): don't clear a comment
+    // that's still pending the login modal / retry.
+    if (wasRealUser) this.newCommentText.set('');
   }
 
   onPrLinkChange(value: string): void {

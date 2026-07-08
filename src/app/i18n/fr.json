@@ -6,7 +6,8 @@
   "header": {
     "appName": "Tickets",
     "newTicket": "+ Nouveau ticket",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "signIn": "Se connecter"
   },
   "theme": {
     "enableLight": "Activer le thème clair",

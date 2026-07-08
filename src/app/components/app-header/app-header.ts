@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthService } from '../../services/auth-service';
 import { TicketStore } from '../../services/ticket-store';
@@ -14,13 +14,13 @@ import { LanguageSwitcher } from '../language-switcher/language-switcher';
 export class AppHeader {
   protected readonly store = inject(TicketStore);
   private readonly auth = inject(AuthService);
-  private readonly router = inject(Router);
 
   protected readonly projectMenuOpen = signal(false);
   protected readonly currentProjectLabel = computed(
     () => this.store.projects.find((p) => p.id === this.store.project())?.label ?? '',
   );
   protected readonly initials = this.auth.initials;
+  protected readonly isRealUser = this.auth.isRealUser;
 
   toggleProjectMenu(): void {
     this.projectMenuOpen.update((v) => !v);
@@ -34,8 +34,11 @@ export class AppHeader {
     event.stopPropagation();
   }
 
+  openLogin(): void {
+    this.store.openLoginModal();
+  }
+
   async logout(): Promise<void> {
     await this.auth.signOut();
-    await this.router.navigateByUrl('/login');
   }
 }

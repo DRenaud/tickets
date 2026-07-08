@@ -3,6 +3,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AppHeader } from '../../components/app-header/app-header';
 import { BacklogView } from '../../components/backlog-view/backlog-view';
 import { KanbanView } from '../../components/kanban-view/kanban-view';
+import { LoginModal } from '../../components/login-modal/login-modal';
 import { NewTicketModal } from '../../components/new-ticket-modal/new-ticket-modal';
 import { ReleaseModal } from '../../components/release-modal/release-modal';
 import { ResolvedView } from '../../components/resolved-view/resolved-view';
@@ -27,6 +28,7 @@ import { TicketStore } from '../../services/ticket-store';
     TicketPicker,
     NewTicketModal,
     ReleaseModal,
+    LoginModal,
     ToastNotification,
     TranslocoPipe,
   ],

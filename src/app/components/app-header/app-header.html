@@ -35,11 +35,15 @@
 
   <button type="button" class="new-ticket" (click)="store.openNewTicket()">{{ 'header.newTicket' | transloco }}</button>
 
-  <button
-    type="button"
-    class="avatar"
-    [attr.title]="'header.signOut' | transloco"
-    [attr.aria-label]="'header.signOut' | transloco"
-    (click)="logout()"
-  >{{ initials() }}</button>
+  @if (isRealUser()) {
+    <button
+      type="button"
+      class="avatar"
+      [attr.title]="'header.signOut' | transloco"
+      [attr.aria-label]="'header.signOut' | transloco"
+      (click)="logout()"
+    >{{ initials() }}</button>
+  } @else {
+    <button type="button" class="sign-in" (click)="openLogin()">{{ 'header.signIn' | transloco }}</button>
+  }
 </div>

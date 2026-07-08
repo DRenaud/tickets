@@ -170,3 +170,21 @@
 .avatar:hover {
   border-color: var(--coral);
 }
+
+.sign-in {
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 16px;
+  font-weight: 700;
+  font-size: 13.5px;
+  cursor: pointer;
+  flex: none;
+  font-family: inherit;
+}
+
+.sign-in:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}

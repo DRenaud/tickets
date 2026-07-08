@@ -30,7 +30,7 @@
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {
-              "allowedHosts": ["localhost:4000", "localhost"]
+              "allowedHosts": ["localhost:4000", "localhost", "ticketing.damien-renaud.com"]
             },
             "ssr": {
               "entry": "src/server.ts"

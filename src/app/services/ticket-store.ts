@@ -1,4 +1,4 @@
-import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { Service, computed, effect, inject, linkedSignal, signal } from '@angular/core';
 import {
   CollectionReference,
   DocumentData,
@@ -20,13 +20,22 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { CATEGORY_META, PROJECTS } from '../data/tickets-seed';
-import { Category, NewTicketForm, PriorityFilter, ProjectId, Ticket, ToastMessage } from '../models/ticket.model';
+import {
+  Category,
+  Comment,
+  NewTicketForm,
+  PriorityFilter,
+  ProjectId,
+  SerializedTicket,
+  Ticket,
+  ToastMessage,
+} from '../models/ticket.model';
 import { getTheme } from '../theme/theme';
 import { AuthService } from './auth-service';
 import { FirebaseAppService } from './firebase-app';
 import { ProjectAccessService } from './project-access-service';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class TicketStore {
   private readonly auth = inject(AuthService);
   private readonly projectAccess = inject(ProjectAccessService);
@@ -54,6 +63,37 @@ export class TicketStore {
   private readonly currentTickets = signal<Ticket[]>([]);
   private toastTimer?: ReturnType<typeof setTimeout>;
   private pendingAction: (() => void) | null = null;
+
+  /**
+   * Reconstructs a real client Timestamp for a SerializedTicket's own
+   * createdAt AND every comment's createdAt — both got flattened to millis
+   * numbers to survive REQUEST_CONTEXT/TransferState (Admin SDK Timestamp
+   * instances don't serialize), and formatDate/formatDateTime need the real
+   * Timestamp.toDate() method back.
+   */
+  private toClientTicket(ticket: SerializedTicket): Ticket {
+    return {
+      ...ticket,
+      createdAt: Timestamp.fromMillis(ticket.createdAt),
+      comments: ticket.comments?.map((c) => ({ ...c, createdAt: Timestamp.fromMillis(c.createdAt) })),
+    } as Ticket;
+  }
+
+  /**
+   * Seeds currentTickets with the full project ticket list fetched
+   * server-side during SSR (see backlog-tickets.resolver.ts, used by the
+   * backlog/kanban/resolved routes), so every view derived from
+   * currentTickets is consistent on first paint, not just whichever tab
+   * triggered the fetch.
+   *
+   * Guarded so it only ever fills a genuinely empty store: once the live
+   * onSnapshot subscription has delivered real data, this becomes a no-op —
+   * the SSR snapshot must never clobber live data.
+   */
+  seedTickets(tickets: SerializedTicket[]): void {
+    if (this.currentTickets().length > 0) return;
+    this.currentTickets.set(tickets.map((t) => this.toClientTicket(t)));
+  }
 
   constructor() {
     const firebaseApp = inject(FirebaseAppService);
@@ -113,11 +153,17 @@ export class TicketStore {
   readonly selectedCount = computed(() => this.selectedBacklog().size);
   readonly hasSelection = computed(() => this.selectedCount() > 0);
 
-  readonly selectedTicket = computed(
+  readonly selectedTicket = linkedSignal(
     () => this.currentTickets().find((t) => t.id === this.selectedTicketId()) ?? null,
   );
 
   readonly releaseCanSubmit = computed(() => this.releaseForm().version.trim().length > 0);
+
+  seedSelectedTicket(ticket: SerializedTicket): void {
+    if (this.selectedTicketId() !== ticket.id) return; // route déjà passée à autre chose
+    this.selectedTicket.set(this.toClientTicket(ticket));
+  }
+
 
   categoryMeta(category: Category) {
     return CATEGORY_META[category];
@@ -250,6 +296,7 @@ export class TicketStore {
         priority: form.priority,
         category: form.category,
         createdBy: this.auth.initials(),
+        createdByUid: this.auth.user()?.uid,
         createdAt: serverTimestamp(),
       });
       this.showToast('toast.created');
@@ -271,7 +318,10 @@ export class TicketStore {
     const trimmed = text.trim();
     const ticket = this.selectedTicket();
     if (!trimmed || !ticket) return;
-    const comments = [...(ticket.comments ?? []), { author: this.auth.initials(), text: trimmed, createdAt: Timestamp.now() }];
+    const comments = [
+      ...(ticket.comments ?? []),
+      { author: this.auth.initials(), authorUid: this.auth.user()?.uid, text: trimmed, createdAt: Timestamp.now() },
+    ];
     this.updateTicket(ticket.id, { comments });
   }
 
@@ -317,6 +367,44 @@ export class TicketStore {
     const upvotes = ticket.upvotes ?? [];
     const next = upvotes.includes(uid) ? upvotes.filter((u) => u !== uid) : [...upvotes, uid];
     this.updateTicket(id, { upvotes: next });
+  }
+
+  // Admin can edit any ticket/comment (unchanged elsewhere in this file);
+  // a real user can additionally edit their own — matched by uid, not the
+  // createdBy/author display string (which isn't a reliable identity: two
+  // people can share the same initials). Tickets created before createdByUid
+  // existed have no uid on file, so only admin can edit those.
+  canEditTicket(ticket: Ticket): boolean {
+    return this.isAdmin() || (this.isRealUser() && !!ticket.createdByUid && ticket.createdByUid === this.auth.user()?.uid);
+  }
+
+  canEditComment(comment: Comment): boolean {
+    return this.isAdmin() || (this.isRealUser() && !!comment.authorUid && comment.authorUid === this.auth.user()?.uid);
+  }
+
+  updateTicketDetails(id: string, changes: { title: string; description: string }): void {
+    const ticket = this.currentTickets().find((t) => t.id === id);
+    if (!ticket || !this.canEditTicket(ticket)) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    const title = changes.title.trim();
+    if (!title) return;
+    this.updateTicket(id, { title, description: changes.description.trim() });
+  }
+
+  updateComment(index: number, text: string): void {
+    const ticket = this.selectedTicket();
+    const comment = ticket?.comments?.[index];
+    if (!ticket || !comment || !this.canEditComment(comment)) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    const comments = [...(ticket.comments ?? [])];
+    comments[index] = { ...comment, text: trimmed };
+    this.updateTicket(ticket.id, { comments });
   }
 
   updatePrLink(link: string): void {

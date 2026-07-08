@@ -42,3 +42,9 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Firebase Admin SDK service account key — never commit this
+*serviceAccount*.json
+*firebase-adminsdk*.json
+.env
+.env.*

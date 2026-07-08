@@ -3,7 +3,26 @@
 
   <div class="layout">
     <div class="main">
-      <div class="title">{{ t.title }}</div>
+      @if (editingTicket()) {
+        <input
+          class="title-input"
+          [value]="editTitleDraft()"
+          (input)="editTitleDraft.set($any($event.target).value)"
+          [attr.aria-label]="'detail.editTitle' | transloco"
+        />
+      } @else {
+        <div class="title-row">
+          <div class="title">{{ t.title }}</div>
+          @if (store.canEditTicket(t)) {
+            <button
+              type="button"
+              class="edit-btn"
+              [attr.aria-label]="'detail.editTicket' | transloco"
+              (click)="startEditTicket()"
+            >✎</button>
+          }
+        </div>
+      }
 
       <div class="stages">
         @for (stage of stages(); track stage.labelKey) {
@@ -17,7 +36,20 @@
         }
       </div>
 
-      <div class="description">{{ t.description || ('detail.noDescription' | transloco) }}</div>
+      @if (editingTicket()) {
+        <textarea
+          class="description-input"
+          [value]="editDescriptionDraft()"
+          (input)="editDescriptionDraft.set($any($event.target).value)"
+          [attr.aria-label]="'detail.editDescription' | transloco"
+        ></textarea>
+        <div class="edit-actions">
+          <button type="button" class="cancel-btn" (click)="cancelEditTicket()">{{ 'common.cancel' | transloco }}</button>
+          <button type="button" class="submit-btn" (click)="saveEditTicket()">{{ 'common.save' | transloco }}</button>
+        </div>
+      } @else {
+        <div class="description">{{ t.description || ('detail.noDescription' | transloco) }}</div>
+      }
 
       @if (t.attachments?.length) {
         <div class="attachments">
@@ -38,150 +70,9 @@
         >▲ {{ 'detail.upvote' | transloco }} · {{ store.upvoteCount(t) }}</button>
       }
 
-      <div class="section-title">{{ 'detail.comments' | transloco }}</div>
-      <div class="comments">
-        @for (c of t.comments; track $index; let i = $index) {
-          <div class="comment">
-            <div class="comment-header">
-              <div class="comment-author">{{ c.author }}</div>
-              <div class="comment-time">{{ formatDateTime(c.createdAt) }}</div>
-              @if (store.isAdmin()) {
-                <button
-                  type="button"
-                  class="bug-link-remove comment-remove"
-                  [attr.aria-label]="'detail.removeComment' | transloco"
-                  (click)="removeComment(i)"
-                >×</button>
-              }
-            </div>
-            <div class="comment-text">{{ c.text }}</div>
-          </div>
-        }
-      </div>
-      @if (t.status === 'backlog') {
-        <div class="comment-form">
-          <input
-            [value]="newCommentText()"
-            (input)="newCommentText.set($any($event.target).value)"
-            (keydown.enter)="submitComment()"
-            [placeholder]="'detail.commentPlaceholder' | transloco"
-            [attr.aria-label]="'detail.commentPlaceholder' | transloco"
-            class="comment-input"
-          />
-          <button type="button" class="comment-submit" (click)="submitComment()">{{ 'detail.send' | transloco }}</button>
-        </div>
-      }
+      <app-ticket-comments [ticket]="t" />
     </div>
 
-    <div class="sidebar">
-      <div class="card">
-        <div class="field">
-          <div class="field-label">{{ 'detail.priority' | transloco }}</div>
-          <div class="field-value">
-            <span class="dot" [class]="'prio-' + t.priority"></span>{{ priorityLabelKey(t.priority) | transloco }}
-          </div>
-        </div>
-        <div class="field">
-          <div class="field-label">{{ 'detail.category' | transloco }}</div>
-          <div class="field-value">{{ store.categoryMeta(t.category).emoji }} {{ store.categoryMeta(t.category).labelKey | transloco }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">{{ 'detail.createdBy' | transloco }}</div>
-          <div class="field-value">{{ t.createdBy }}</div>
-        </div>
-        <div class="field">
-          <div class="field-label">{{ 'detail.createdOn' | transloco }}</div>
-          <div class="field-value">{{ formatDate(t.createdAt) }}</div>
-        </div>
-        @if (t.status === 'resolved') {
-          <div class="field">
-            <div class="field-label">{{ 'detail.version' | transloco }}</div>
-            <div class="field-value field-value-mint">✓ {{ t.version }}</div>
-          </div>
-        }
-      </div>
-
-      <div class="card">
-        <div class="field-label">{{ 'detail.timeSpent' | transloco }}</div>
-        @if (store.isAdmin()) {
-          <div class="time-spent">
-            <input
-              type="number"
-              min="0"
-              step="5"
-              [value]="t.timeSpentMinutes ?? 0"
-              (change)="onTimeSpentChange($any($event.target).value)"
-              [attr.aria-label]="'detail.timeSpent' | transloco"
-              class="time-input"
-            />
-            <span class="time-unit">{{ 'detail.minutes' | transloco }}</span>
-          </div>
-        } @else {
-          <div class="field-value">{{ t.timeSpentMinutes ?? 0 }} {{ 'detail.minutes' | transloco }}</div>
-        }
-      </div>
-
-      <div class="card">
-        <div class="field">
-          <div class="field-label">{{ 'detail.prLink' | transloco }}</div>
-          @if (store.isAdmin()) {
-            <input
-              [value]="t.prLink ?? ''"
-              (change)="onPrLinkChange($any($event.target).value)"
-              placeholder="https://github.com/…/pull/…"
-              [attr.aria-label]="'detail.prLink' | transloco"
-              class="text-input"
-            />
-          } @else if (t.prLink) {
-            <a [href]="t.prLink" target="_blank" rel="noopener" class="bug-link">{{ t.prLink }}</a>
-          } @else {
-            <div class="field-value">—</div>
-          }
-        </div>
-        <div class="field">
-          <div class="field-label">{{ 'detail.bugReports' | transloco }}</div>
-          @for (link of t.bugReportLinks; track link; let i = $index) {
-            <div class="bug-link-row">
-              <a [href]="link" target="_blank" rel="noopener" class="bug-link">🐞 {{ link }}</a>
-              @if (store.isAdmin()) {
-                <button
-                  type="button"
-                  class="bug-link-remove"
-                  [attr.aria-label]="'detail.removeBugReport' | transloco"
-                  (click)="removeBugLink(i)"
-                >×</button>
-              }
-            </div>
-          }
-          @if (store.isAdmin()) {
-            <div class="bug-link-form">
-              <input
-                [value]="newBugLinkDraft()"
-                (input)="newBugLinkDraft.set($any($event.target).value)"
-                [placeholder]="'detail.bugLinkPlaceholder' | transloco"
-                [attr.aria-label]="'detail.bugLinkPlaceholder' | transloco"
-                class="text-input"
-              />
-              <button
-                type="button"
-                class="bug-link-add"
-                [attr.aria-label]="'detail.addBugReport' | transloco"
-                (click)="submitBugLink()"
-              >+</button>
-            </div>
-          }
-        </div>
-      </div>
-
-      @if (store.isAdmin() && canAdvance()) {
-        <button type="button" class="action-btn action-btn-primary" (click)="advance()">{{ advanceLabelKey() | transloco }}</button>
-      }
-      @if (store.isAdmin() && canAddToSprint()) {
-        <button type="button" class="action-btn action-btn-outline" (click)="addToSprint()">{{ 'backlog.addToSprint' | transloco }}</button>
-      }
-      @if (store.isAdmin()) {
-        <button type="button" class="action-btn action-btn-danger" (click)="deleteTicket()">{{ 'detail.deleteTicket' | transloco }}</button>
-      }
-    </div>
+    <app-ticket-sidebar [ticket]="t" />
   </div>
 }

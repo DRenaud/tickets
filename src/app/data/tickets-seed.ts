@@ -3,6 +3,7 @@ import { Category, Project } from '../models/ticket.model';
 export const PROJECTS: Project[] = [
   { id: 'alveola', label: 'Alvéola' },
   { id: 'ludistes', label: 'Ludistes Charentais' },
+  { id: 'ticket', label: 'Ticketing' },
 ];
 
 export const CATEGORY_META: Record<Category, { emoji: string; labelKey: string }> = {

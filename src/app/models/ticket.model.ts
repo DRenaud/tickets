@@ -3,7 +3,7 @@ import { Timestamp } from 'firebase/firestore';
 export type Priority = 'low' | 'medium' | 'high';
 export type Category = 'bug' | 'idea' | 'design' | 'tech';
 export type Status = 'backlog' | 'todo' | 'inprogress' | 'done' | 'resolved';
-export type ProjectId = 'alveola' | 'ludistes';
+export type ProjectId = 'alveola' | 'ludistes' | 'ticket';
 export type Tab = 'backlog' | 'kanban' | 'resolved';
 export type PriorityFilter = 'all' | Priority;
 

@@ -24,13 +24,15 @@ import { Category, NewTicketForm, PriorityFilter, ProjectId, Tab, Ticket, ToastM
 import { getTheme } from '../theme/theme';
 import { AuthService } from './auth-service';
 import { FirebaseAppService } from './firebase-app';
+import { ProjectAccessService } from './project-access-service';
 
 @Injectable({ providedIn: 'root' })
 export class TicketStore {
-  readonly projects = PROJECTS;
   private readonly auth = inject(AuthService);
+  private readonly projectAccess = inject(ProjectAccessService);
   readonly isAdmin = this.auth.isAdmin;
   readonly isRealUser = this.auth.isRealUser;
+  readonly projects = computed(() => PROJECTS.filter((p) => this.projectAccess.knownProjectIds().has(p.id)));
 
   readonly dark = signal(true);
   readonly project = signal<ProjectId>('alveola');
@@ -144,6 +146,7 @@ export class TicketStore {
 
   onLoginSuccess(): void {
     this.loginModalOpen.set(false);
+    void this.projectAccess.onLoginSuccess();
     const action = this.pendingAction;
     this.pendingAction = null;
     action?.();
@@ -154,6 +157,7 @@ export class TicketStore {
   }
 
   switchProject(id: ProjectId): void {
+    this.projectAccess.markVisited(id);
     this.project.set(id);
     this.tab.set('backlog');
     this.selectedBacklog.set(new Set());

@@ -41,5 +41,9 @@ service cloud.firestore {
         allow delete: if isAdmin();
       }
     }
+
+    match /users/{userId} {
+      allow read, write: if isRealUser() && request.auth.uid == userId;
+    }
   }
 }

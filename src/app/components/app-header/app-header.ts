@@ -17,7 +17,7 @@ export class AppHeader {
 
   protected readonly projectMenuOpen = signal(false);
   protected readonly currentProjectLabel = computed(
-    () => this.store.projects.find((p) => p.id === this.store.project())?.label ?? '',
+    () => this.store.projects().find((p) => p.id === this.store.project())?.label ?? '',
   );
   protected readonly initials = this.auth.initials;
   protected readonly isRealUser = this.auth.isRealUser;

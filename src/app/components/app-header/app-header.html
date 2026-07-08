@@ -12,7 +12,7 @@
     @if (projectMenuOpen()) {
       <div class="project-menu-backdrop" (click)="closeProjectMenu()"></div>
       <div class="project-menu" (click)="stopPropagation($event)">
-        @for (proj of store.projects; track proj.id) {
+        @for (proj of store.projects(); track proj.id) {
           <a
             class="project-menu-item"
             [class.project-menu-item-active]="store.project() === proj.id"

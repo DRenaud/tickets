@@ -1,0 +1,163 @@
+.sidebar {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 260px;
+}
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.field-value {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-value-mint {
+  color: var(--mint);
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.prio-high {
+  background: var(--coral);
+}
+
+.prio-medium {
+  background: var(--amber);
+}
+
+.prio-low {
+  background: var(--mint);
+}
+
+.time-spent {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-input {
+  font-family: 'Sora', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  flex: 1;
+  width: 0;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  color: var(--text);
+}
+
+.time-unit {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.text-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12.5px;
+  color: var(--text);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.bug-link-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.bug-link {
+  flex: 1;
+  font-size: 12px;
+  color: var(--accent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bug-link-remove {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 14px;
+  flex: none;
+  background: none;
+  border: none;
+}
+
+.bug-link-form {
+  display: flex;
+  gap: 6px;
+}
+
+.bug-link-add {
+  background: var(--bg-hover);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: none;
+  color: var(--text);
+}
+
+.action-btn {
+  text-align: center;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.action-btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+
+.action-btn-outline {
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  background: transparent;
+}
+
+.action-btn-danger {
+  border: 1.5px solid var(--coral);
+  color: var(--coral);
+  background: transparent;
+}

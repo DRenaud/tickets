@@ -1,4 +1,4 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Service, computed, inject, signal } from '@angular/core';
 import {
   Auth,
   GoogleAuthProvider,
@@ -15,7 +15,7 @@ import { FirebaseAppService } from './firebase-app';
 
 const ADMIN_EMAIL = 'contact@damien-renaud.com';
 
-@Injectable({ providedIn: 'root' })
+@Service()
 export class AuthService {
   private readonly firebaseApp = inject(FirebaseAppService);
   private auth: Auth | null = null;

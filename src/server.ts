@@ -6,8 +6,13 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { fetchProjectTickets, fetchTicketDetail } from './app/services/firebase-admin.server';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
+// The BACKLOG_PATH regex matches the /:projectId/backlog, /:projectId/kanban, and /:projectId/resolved routes.
+const BACKLOG_PATH = /^\/([^/]+)\/(backlog|kanban|resolved)\/?$/;
+// The TICKET_PATH regex matches the /:projectId/ticket/:ticketId route.
+const TICKET_PATH = /^\/([^/]+)\/(ticket)\/([^/]+)\/?$/;
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
@@ -37,10 +42,38 @@ app.use(
 
 /**
  * Handle all other requests by rendering the Angular application.
+ *
+ * For the /:projectId/backlog route (the only one running RenderMode.Server,
+ * see app.routes.server.ts) we fetch the backlog with Admin SDK privileges
+ * *here*, before Angular even starts rendering, and pass it through as
+ * REQUEST_CONTEXT — the only way to guarantee this Admin SDK call never
+ * gets pulled into the browser bundle (see backlog-tickets.resolver.ts).
  */
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+  const backlogPathMatch = req.path.match(BACKLOG_PATH);
+  const ticketPathMatch = req.path.match(TICKET_PATH);
+  let context: Record<string, unknown> = {};
+
+  if (backlogPathMatch) {
+    try {
+      context = { initialProjectTickets: await fetchProjectTickets(backlogPathMatch[1]) };
+    } catch (error) {
+      // SSR data-fetch failing shouldn't break the whole render — the
+      // client-side Firestore subscription still takes over after hydration.
+      console.error('SSR backlog fetch failed:', error);
+    }
+  }
+
+  if (ticketPathMatch) {
+    try {
+      context = { initialTicketDetail: await fetchTicketDetail(ticketPathMatch[1], ticketPathMatch[3]) };
+    } catch (error) {
+      console.error('SSR ticket fetch failed:', error);
+    }
+  }
+
   angularApp
-    .handle(req)
+    .handle(req, context)
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
     )

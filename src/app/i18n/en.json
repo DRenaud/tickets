@@ -1,7 +1,8 @@
 {
   "common": {
     "cancel": "Cancel",
-    "close": "Close"
+    "close": "Close",
+    "save": "Save"
   },
   "header": {
     "appName": "Tickets",
@@ -99,7 +100,13 @@
     "markDone": "Mark as done",
     "upvote": "Upvote",
     "deleteTicket": "Delete ticket",
-    "confirmDeleteTicket": "Delete this ticket? This cannot be undone."
+    "confirmDeleteTicket": "Delete this ticket? This cannot be undone.",
+    "confirmRemoveComment": "Delete this comment? This cannot be undone.",
+    "confirmRemoveBugReport": "Remove this bug report? This cannot be undone.",
+    "editTicket": "Edit ticket",
+    "editTitle": "Ticket title",
+    "editDescription": "Ticket description",
+    "editComment": "Edit comment"
   },
   "release": {
     "title": "Release-it 🚀",

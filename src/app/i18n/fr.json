@@ -1,7 +1,8 @@
 {
   "common": {
     "cancel": "Annuler",
-    "close": "Fermer"
+    "close": "Fermer",
+    "save": "Enregistrer"
   },
   "header": {
     "appName": "Tickets",
@@ -99,7 +100,13 @@
     "markDone": "Marquer terminé",
     "upvote": "Voter",
     "deleteTicket": "Supprimer le ticket",
-    "confirmDeleteTicket": "Supprimer ce ticket ? Cette action est irréversible."
+    "confirmDeleteTicket": "Supprimer ce ticket ? Cette action est irréversible.",
+    "confirmRemoveComment": "Supprimer ce commentaire ? Cette action est irréversible.",
+    "confirmRemoveBugReport": "Supprimer ce rapport de bug ? Cette action est irréversible.",
+    "editTicket": "Modifier le ticket",
+    "editTitle": "Titre du ticket",
+    "editDescription": "Description du ticket",
+    "editComment": "Modifier le commentaire"
   },
   "release": {
     "title": "Release-it 🚀",

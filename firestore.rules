@@ -32,10 +32,13 @@ service cloud.firestore {
 
         allow update: if isAdmin() || (
           isRealUser()
-          && resource.data.status == 'backlog'
-          && request.resource.data.status == 'backlog'
-          && request.resource.data.diff(resource.data).affectedKeys()
-               .hasOnly(['comments', 'upvotes'])
+          && (
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['comments', 'upvotes'])
+            || (
+              request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title', 'description'])
+              && resource.data.createdByUid == request.auth.uid
+            )
+          )
         );
 
         allow delete: if isAdmin();

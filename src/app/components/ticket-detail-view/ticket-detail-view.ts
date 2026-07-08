@@ -1,11 +1,10 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
-import { Timestamp } from 'firebase/firestore';
-import { AppLang, LocaleService } from '../../services/locale-service';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TicketComments } from '../ticket-comments/ticket-comments';
+import { TicketSidebar } from '../ticket-sidebar/ticket-sidebar';
 import { TicketStore } from '../../services/ticket-store';
-import { formatDate, formatDateTime } from '../../theme/format-date';
-import { priorityLabelKey } from '../../theme/theme';
+import type { SerializedTicket } from '../../models/ticket.model';
 
 const STAGE_DEFS = [
   { key: 'backlog', labelKey: 'status.backlog' },
@@ -15,32 +14,34 @@ const STAGE_DEFS = [
   { key: 'resolved', labelKey: 'status.resolved' },
 ] as const;
 
-const DATE_LOCALES: Record<AppLang, string> = { fr: 'fr-FR', en: 'en-US' };
-
 @Component({
   selector: 'app-ticket-detail-view',
-  imports: [TranslocoPipe],
+  imports: [TranslocoPipe, TicketComments, TicketSidebar],
   templateUrl: './ticket-detail-view.html',
   styleUrl: './ticket-detail-view.css',
 })
 export class TicketDetailView {
   protected readonly store = inject(TicketStore);
-  private readonly locale = inject(LocaleService);
-  private readonly transloco = inject(TranslocoService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   protected readonly ticket = this.store.selectedTicket;
 
   readonly ticketId = input.required<string>();
+  readonly initialTicketDetail = input<SerializedTicket | null>(null);
 
-  protected readonly newCommentText = signal('');
-  protected readonly newBugLinkDraft = signal('');
-
-  protected readonly priorityLabelKey = priorityLabelKey;
-  private readonly dateLocale = computed(() => DATE_LOCALES[this.locale.lang()]);
+  protected readonly editingTicket = signal(false);
+  protected readonly editTitleDraft = signal('');
+  protected readonly editDescriptionDraft = signal('');
 
   constructor() {
-    effect(() => this.store.openDetail(this.ticketId()));
+    effect(() => {
+      const id = this.ticketId();
+      this.store.openDetail(id);
+      const detail = this.initialTicketDetail();
+      if (detail && detail.id === id) {
+        this.store.seedSelectedTicket(detail);
+      }
+    });
   }
 
   protected readonly stages = computed(() => {
@@ -54,74 +55,26 @@ export class TicketDetailView {
     }));
   });
 
-  protected readonly canAdvance = computed(() => {
-    const status = this.ticket()?.status;
-    return status === 'todo' || status === 'inprogress';
-  });
-  protected readonly canAddToSprint = computed(() => this.ticket()?.status === 'backlog');
-  protected readonly advanceLabelKey = computed(() =>
-    this.ticket()?.status === 'todo' ? 'detail.moveToInProgress' : 'detail.markDone',
-  );
-
-  formatDate(timestamp: Timestamp | undefined): string {
-    return formatDate(timestamp, this.dateLocale());
-  }
-
-  formatDateTime(timestamp: Timestamp | undefined): string {
-    return formatDateTime(timestamp, this.dateLocale());
-  }
-
   back(): void {
     this.router.navigate(['..'], { relativeTo: this.route });
   }
 
-  submitComment(): void {
-    if (!this.newCommentText().trim()) return;
-    const wasRealUser = this.store.isRealUser();
-    this.store.addComment(this.newCommentText());
-    // Same reasoning as NewTicketModal.submit(): don't clear a comment
-    // that's still pending the login modal / retry.
-    if (wasRealUser) this.newCommentText.set('');
+  startEditTicket(): void {
+    const t = this.ticket();
+    if (!t) return;
+    this.editTitleDraft.set(t.title);
+    this.editDescriptionDraft.set(t.description ?? '');
+    this.editingTicket.set(true);
   }
 
-  onPrLinkChange(value: string): void {
-    this.store.updatePrLink(value);
+  cancelEditTicket(): void {
+    this.editingTicket.set(false);
   }
 
-  submitBugLink(): void {
-    if (!this.newBugLinkDraft().trim()) return;
-    this.store.addBugLink(this.newBugLinkDraft());
-    this.newBugLinkDraft.set('');
-  }
-
-  removeBugLink(index: number): void {
-    this.store.removeBugLink(index);
-  }
-
-  removeComment(index: number): void {
-    this.store.removeComment(index);
-  }
-
-  deleteTicket(): void {
-    const ticket = this.ticket();
-    if (!ticket) return;
-    if (!confirm(this.transloco.translate('detail.confirmDeleteTicket'))) return;
-    this.store.deleteTicket(ticket.id);
-    this.back();
-  }
-
-  onTimeSpentChange(value: string): void {
-    const minutes = Number(value);
-    this.store.updateTimeSpent(Number.isFinite(minutes) ? minutes : 0);
-  }
-
-  advance(): void {
-    const id = this.ticket()?.id;
-    if (id) this.store.advanceTicket(id);
-  }
-
-  addToSprint(): void {
-    const id = this.ticket()?.id;
-    if (id) this.store.addFromBacklogToSprint(id);
+  saveEditTicket(): void {
+    const t = this.ticket();
+    if (!t) return;
+    this.store.updateTicketDetails(t.id, { title: this.editTitleDraft(), description: this.editDescriptionDraft() });
+    this.editingTicket.set(false);
   }
 }

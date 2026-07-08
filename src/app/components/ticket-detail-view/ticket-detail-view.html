@@ -59,16 +59,14 @@
         </div>
       }
 
-      @if (t.status === 'backlog') {
-        <button
-          type="button"
-          class="upvote-btn"
-          [class.upvote-btn-active]="store.hasUpvoted(t)"
-          [attr.aria-pressed]="store.hasUpvoted(t)"
-          [attr.aria-label]="'detail.upvote' | transloco"
-          (click)="store.toggleUpvote(t.id)"
-        >▲ {{ 'detail.upvote' | transloco }} · {{ store.upvoteCount(t) }}</button>
-      }
+      <button
+        type="button"
+        class="upvote-btn"
+        [class.upvote-btn-active]="store.hasUpvoted(t)"
+        [attr.aria-pressed]="store.hasUpvoted(t)"
+        [attr.aria-label]="'detail.upvote' | transloco"
+        (click)="store.toggleUpvote(t.id)"
+      >▲ {{ 'detail.upvote' | transloco }} · {{ store.upvoteCount(t) }}</button>
 
       <app-ticket-comments [ticket]="t" />
     </div>

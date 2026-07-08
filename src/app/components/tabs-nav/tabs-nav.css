@@ -16,6 +16,8 @@
   background: transparent;
   transition: color 0.15s ease;
   font-family: inherit;
+  text-decoration: none;
+  display: inline-block;
 }
 
 .tab-active {

@@ -15,7 +15,7 @@
       @if (group.expanded) {
         <div class="group-body">
           @for (item of group.tickets; track item.id) {
-            <div class="row" (click)="store.openDetail(item.id)">
+            <div class="row" [routerLink]="['../ticket', item.id]">
               <div class="check">✓</div>
               <div class="title">{{ item.title }}</div>
               <div class="category">{{ store.categoryMeta(item.category).emoji }} {{ store.categoryMeta(item.category).labelKey | transloco }}</div>

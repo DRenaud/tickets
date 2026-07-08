@@ -16,7 +16,7 @@
   <div class="column">
     <div class="column-title">{{ 'status.todo' | transloco }} · {{ store.todoList().length }}</div>
     @for (item of store.todoList(); track item.id) {
-      <div class="card" (click)="store.openDetail(item.id)">
+      <div class="card" [routerLink]="['../ticket', item.id]">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
@@ -38,7 +38,7 @@
   <div class="column">
     <div class="column-title">{{ 'status.inprogress' | transloco }} · {{ store.inProgressList().length }}</div>
     @for (item of store.inProgressList(); track item.id) {
-      <div class="card" (click)="store.openDetail(item.id)">
+      <div class="card" [routerLink]="['../ticket', item.id]">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="priority-dot" [class]="'prio-' + item.priority"></div>
@@ -60,7 +60,7 @@
   <div class="column">
     <div class="column-title">{{ 'status.done' | transloco }} · {{ store.doneList().length }}</div>
     @for (item of store.doneList(); track item.id) {
-      <div class="card card-done" (click)="store.openDetail(item.id)">
+      <div class="card card-done" [routerLink]="['../ticket', item.id]">
         <div class="card-title">{{ item.title }}</div>
         <div class="card-footer">
           <div class="category">{{ store.categoryMeta(item.category).emoji }}</div>

@@ -12,6 +12,26 @@ export const routes: Routes = [
     canMatch: [isValidProjectId],
     canActivate: [authReadyGuard],
     loadComponent: () => import('./pages/ticket-board-page/ticket-board-page').then((m) => m.TicketBoardPage),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'backlog' },
+      {
+        path: 'backlog',
+        loadComponent: () => import('./components/backlog-view/backlog-view').then((m) => m.BacklogView),
+      },
+      {
+        path: 'kanban',
+        loadComponent: () => import('./components/kanban-view/kanban-view').then((m) => m.KanbanView),
+      },
+      {
+        path: 'resolved',
+        loadComponent: () => import('./components/resolved-view/resolved-view').then((m) => m.ResolvedView),
+      },
+      {
+        path: 'ticket/:ticketId',
+        loadComponent: () =>
+          import('./components/ticket-detail-view/ticket-detail-view').then((m) => m.TicketDetailView),
+      },
+    ],
   },
   { path: '**', redirectTo: 'alveola' },
 ];

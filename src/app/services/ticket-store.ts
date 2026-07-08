@@ -20,7 +20,7 @@ import {
   writeBatch,
 } from 'firebase/firestore';
 import { CATEGORY_META, PROJECTS } from '../data/tickets-seed';
-import { Category, NewTicketForm, PriorityFilter, ProjectId, Tab, Ticket, ToastMessage } from '../models/ticket.model';
+import { Category, NewTicketForm, PriorityFilter, ProjectId, Ticket, ToastMessage } from '../models/ticket.model';
 import { getTheme } from '../theme/theme';
 import { AuthService } from './auth-service';
 import { FirebaseAppService } from './firebase-app';
@@ -36,7 +36,6 @@ export class TicketStore {
 
   readonly dark = signal(true);
   readonly project = signal<ProjectId>('alveola');
-  readonly tab = signal<Tab>('backlog');
   readonly filterPriority = signal<PriorityFilter>('all');
   readonly pickerOpen = signal(false);
   readonly newTicketOpen = signal(false);
@@ -159,15 +158,9 @@ export class TicketStore {
   switchProject(id: ProjectId): void {
     this.projectAccess.markVisited(id);
     this.project.set(id);
-    this.tab.set('backlog');
     this.selectedBacklog.set(new Set());
     this.filterPriority.set('all');
     this.selectedTicketId.set(null);
-  }
-
-  setTab(tab: Tab): void {
-    this.tab.set(tab);
-    this.pickerOpen.set(false);
   }
 
   setFilterPriority(p: PriorityFilter): void {

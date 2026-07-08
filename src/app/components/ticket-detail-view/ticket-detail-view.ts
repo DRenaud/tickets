@@ -1,4 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Timestamp } from 'firebase/firestore';
 import { AppLang, LocaleService } from '../../services/locale-service';
@@ -26,13 +27,21 @@ export class TicketDetailView {
   protected readonly store = inject(TicketStore);
   private readonly locale = inject(LocaleService);
   private readonly transloco = inject(TranslocoService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   protected readonly ticket = this.store.selectedTicket;
+
+  readonly ticketId = input.required<string>();
 
   protected readonly newCommentText = signal('');
   protected readonly newBugLinkDraft = signal('');
 
   protected readonly priorityLabelKey = priorityLabelKey;
   private readonly dateLocale = computed(() => DATE_LOCALES[this.locale.lang()]);
+
+  constructor() {
+    effect(() => this.store.openDetail(this.ticketId()));
+  }
 
   protected readonly stages = computed(() => {
     const ticket = this.ticket();
@@ -63,7 +72,7 @@ export class TicketDetailView {
   }
 
   back(): void {
-    this.store.closeDetail();
+    this.router.navigate(['..'], { relativeTo: this.route });
   }
 
   submitComment(): void {
@@ -98,6 +107,7 @@ export class TicketDetailView {
     if (!ticket) return;
     if (!confirm(this.transloco.translate('detail.confirmDeleteTicket'))) return;
     this.store.deleteTicket(ticket.id);
+    this.back();
   }
 
   onTimeSpentChange(value: string): void {

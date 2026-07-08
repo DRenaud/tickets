@@ -18,24 +18,12 @@
   <div class="content">
     <div class="greeting">{{ ('board.greeting.' + store.project()) | transloco }}</div>
 
-    @if (store.selectedTicketId()) {
-      <app-ticket-detail-view />
-    } @else {
+    @if (!isTicketDetailRoute()) {
       <app-stats-bar />
       <app-tabs-nav />
-
-      @switch (store.tab()) {
-        @case ('backlog') {
-          <app-backlog-view />
-        }
-        @case ('kanban') {
-          <app-kanban-view />
-        }
-        @case ('resolved') {
-          <app-resolved-view />
-        }
-      }
     }
+
+    <router-outlet />
   </div>
 
   <app-ticket-picker />

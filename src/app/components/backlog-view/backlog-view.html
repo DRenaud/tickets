@@ -20,7 +20,7 @@
 
 <div class="list">
   @for (item of store.backlogList(); track item.id) {
-    <div class="row" (click)="store.openDetail(item.id)">
+    <div class="row" [routerLink]="['../ticket', item.id]">
       @if (store.isAdmin()) {
         <button
           type="button"

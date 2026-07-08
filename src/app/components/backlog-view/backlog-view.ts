@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { PriorityFilter } from '../../models/ticket.model';
 import { TicketStore } from '../../services/ticket-store';
 
 @Component({
   selector: 'app-backlog-view',
-  imports: [TranslocoPipe],
+  imports: [RouterLink, TranslocoPipe],
   templateUrl: './backlog-view.html',
   styleUrl: './backlog-view.css',
 })

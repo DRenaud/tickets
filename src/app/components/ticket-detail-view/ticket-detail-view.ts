@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { Timestamp } from 'firebase/firestore';
 import { AppLang, LocaleService } from '../../services/locale-service';
 import { TicketStore } from '../../services/ticket-store';
@@ -25,6 +25,7 @@ const DATE_LOCALES: Record<AppLang, string> = { fr: 'fr-FR', en: 'en-US' };
 export class TicketDetailView {
   protected readonly store = inject(TicketStore);
   private readonly locale = inject(LocaleService);
+  private readonly transloco = inject(TranslocoService);
   protected readonly ticket = this.store.selectedTicket;
 
   protected readonly newCommentText = signal('');
@@ -83,6 +84,17 @@ export class TicketDetailView {
 
   removeBugLink(index: number): void {
     this.store.removeBugLink(index);
+  }
+
+  removeComment(index: number): void {
+    this.store.removeComment(index);
+  }
+
+  deleteTicket(): void {
+    const ticket = this.ticket();
+    if (!ticket) return;
+    if (!confirm(this.transloco.translate('detail.confirmDeleteTicket'))) return;
+    this.store.deleteTicket(ticket.id);
   }
 
   onTimeSpentChange(value: string): void {

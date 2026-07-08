@@ -93,9 +93,12 @@
     "bugLinkPlaceholder": "Report link (BGA…)",
     "addBugReport": "Add bug report",
     "removeBugReport": "Remove bug report",
+    "removeComment": "Remove comment",
     "moveToInProgress": "Move to in progress",
     "markDone": "Mark as done",
-    "upvote": "Upvote"
+    "upvote": "Upvote",
+    "deleteTicket": "Delete ticket",
+    "confirmDeleteTicket": "Delete this ticket? This cannot be undone."
   },
   "release": {
     "title": "Release-it 🚀",

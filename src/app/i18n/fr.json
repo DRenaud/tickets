@@ -93,9 +93,12 @@
     "bugLinkPlaceholder": "Lien du rapport (BGA…)",
     "addBugReport": "Ajouter le rapport de bug",
     "removeBugReport": "Supprimer le rapport de bug",
+    "removeComment": "Supprimer le commentaire",
     "moveToInProgress": "Passer en cours",
     "markDone": "Marquer terminé",
-    "upvote": "Voter"
+    "upvote": "Voter",
+    "deleteTicket": "Supprimer le ticket",
+    "confirmDeleteTicket": "Supprimer ce ticket ? Cette action est irréversible."
   },
   "release": {
     "title": "Release-it 🚀",

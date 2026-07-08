@@ -7,6 +7,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   deleteField,
   doc,
   getFirestore,
@@ -247,6 +248,31 @@ export class TicketStore {
     if (!trimmed || !ticket) return;
     const comments = [...(ticket.comments ?? []), { author: this.auth.initials(), text: trimmed, createdAt: Timestamp.now() }];
     this.updateTicket(ticket.id, { comments });
+  }
+
+  removeComment(index: number): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    const ticket = this.selectedTicket();
+    if (!ticket) return;
+    const comments = [...(ticket.comments ?? [])];
+    comments.splice(index, 1);
+    this.updateTicket(ticket.id, { comments });
+  }
+
+  deleteTicket(id: string): void {
+    if (!this.isAdmin() || !this.db) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    const ref = doc(this.db, 'projects', this.project(), 'tickets', id);
+    deleteDoc(ref)
+      .then(() => {
+        if (this.selectedTicketId() === id) this.closeDetail();
+      })
+      .catch(() => this.showToast('toast.updateFailed'));
   }
 
   upvoteCount(ticket: Ticket): number {

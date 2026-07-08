@@ -40,11 +40,19 @@
 
       <div class="section-title">{{ 'detail.comments' | transloco }}</div>
       <div class="comments">
-        @for (c of t.comments; track $index) {
+        @for (c of t.comments; track $index; let i = $index) {
           <div class="comment">
             <div class="comment-header">
               <div class="comment-author">{{ c.author }}</div>
               <div class="comment-time">{{ formatDateTime(c.createdAt) }}</div>
+              @if (store.isAdmin()) {
+                <button
+                  type="button"
+                  class="bug-link-remove comment-remove"
+                  [attr.aria-label]="'detail.removeComment' | transloco"
+                  (click)="removeComment(i)"
+                >×</button>
+              }
             </div>
             <div class="comment-text">{{ c.text }}</div>
           </div>
@@ -170,6 +178,9 @@
       }
       @if (store.isAdmin() && canAddToSprint()) {
         <button type="button" class="action-btn action-btn-outline" (click)="addToSprint()">{{ 'backlog.addToSprint' | transloco }}</button>
+      }
+      @if (store.isAdmin()) {
+        <button type="button" class="action-btn action-btn-danger" (click)="deleteTicket()">{{ 'detail.deleteTicket' | transloco }}</button>
       }
     </div>
   </div>

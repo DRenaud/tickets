@@ -169,6 +169,10 @@
   margin-bottom: 4px;
 }
 
+.comment-remove {
+  margin-left: auto;
+}
+
 .comment-author {
   font-weight: 700;
   font-size: 12.5px;
@@ -369,5 +373,11 @@
 .action-btn-outline {
   border: 1.5px solid var(--accent);
   color: var(--accent);
+  background: transparent;
+}
+
+.action-btn-danger {
+  border: 1.5px solid var(--coral);
+  color: var(--coral);
   background: transparent;
 }

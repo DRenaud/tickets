@@ -156,3 +156,39 @@
   color: var(--mint);
   font-weight: 600;
 }
+
+@media (max-width: 768px) {
+  /* Edge-to-edge horizontal swipe between columns; bleed matches .content padding */
+  .columns {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    margin-inline: -28px;
+    padding-inline: 28px;
+    scroll-padding-inline: 28px;
+  }
+
+  .column {
+    flex: 0 0 80vw;
+    max-width: 300px;
+    scroll-snap-align: start;
+  }
+}
+
+@media (max-width: 640px) {
+  .columns {
+    margin-inline: -16px;
+    padding-inline: 16px;
+    scroll-padding-inline: 16px;
+  }
+
+  .toolbar {
+    flex-wrap: wrap;
+  }
+}
+
+@media (pointer: coarse) {
+  .advance-btn {
+    width: 32px;
+    height: 32px;
+  }
+}

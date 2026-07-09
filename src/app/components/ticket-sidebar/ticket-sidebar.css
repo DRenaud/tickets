@@ -6,6 +6,12 @@
   max-width: 260px;
 }
 
+@media (max-width: 768px) {
+  .sidebar {
+    max-width: none;
+  }
+}
+
 .card {
   background: var(--bg-elevated);
   border: 1px solid var(--border);

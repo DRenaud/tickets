@@ -167,3 +167,29 @@
   background: var(--accent-soft);
   color: var(--accent);
 }
+
+@media (max-width: 640px) {
+  .filters {
+    flex-wrap: wrap;
+  }
+
+  .selection-banner {
+    flex-wrap: wrap;
+  }
+
+  .row {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+}
+
+@media (pointer: coarse) {
+  .checkbox {
+    width: 32px;
+    height: 32px;
+  }
+
+  .upvote-btn {
+    padding: 8px 12px;
+  }
+}

@@ -24,3 +24,19 @@
   color: var(--text);
   border-bottom-color: var(--accent);
 }
+
+@media (max-width: 640px) {
+  .tabs {
+    gap: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab {
+    white-space: nowrap;
+  }
+}

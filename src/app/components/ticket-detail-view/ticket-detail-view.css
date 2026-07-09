@@ -234,3 +234,20 @@
   background: var(--accent-soft);
   color: var(--accent);
 }
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .title,
+  .title-input {
+    font-size: 19px;
+  }
+
+  .stage-label {
+    font-size: 10px;
+  }
+}

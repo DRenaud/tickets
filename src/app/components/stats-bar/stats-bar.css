@@ -36,3 +36,17 @@
   color: var(--text-muted);
   margin-top: 2px;
 }
+
+@media (max-width: 640px) {
+  .stats {
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px 8px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+}

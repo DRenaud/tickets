@@ -1,3 +1,10 @@
 /* You can add global styles to this file, and also import other style files */
 
+/*
+ * Responsive breakpoints (convention — media queries can't read CSS variables):
+ *   - max-width: 768px → stack multi-column layouts (kanban, ticket detail)
+ *   - max-width: 640px → mobile compaction (header, paddings, font sizes)
+ * Reuse these values in any new component.
+ */
+
 @import 'tailwindcss';

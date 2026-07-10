@@ -1,4 +1,4 @@
-import { Service, computed, effect, inject, linkedSignal, signal } from '@angular/core';
+import { Service, computed, effect, inject, linkedSignal, signal, untracked } from '@angular/core';
 import {
   CollectionReference,
   DocumentData,
@@ -89,9 +89,19 @@ export class TicketStore {
    * Guarded so it only ever fills a genuinely empty store: once the live
    * onSnapshot subscription has delivered real data, this becomes a no-op —
    * the SSR snapshot must never clobber live data.
+   *
+   * An empty seed list is a no-op: seeding [] over [] would still call
+   * currentTickets.set() with a fresh array reference, and since callers
+   * invoke this from an effect, that re-triggers the effect and spins
+   * forever — during SSR the render never stabilizes and the request hangs
+   * with the CPU pegged. Same reason the guard reads currentTickets via
+   * untracked(): the store's own state must not become a dependency of the
+   * caller's effect, or emptying the store (deleting the last ticket)
+   * re-runs the seed and resurrects stale SSR data in the UI.
    */
   seedTickets(tickets: SerializedTicket[]): void {
-    if (this.currentTickets().length > 0) return;
+    if (tickets.length === 0) return;
+    if (untracked(this.currentTickets).length > 0) return;
     this.currentTickets.set(tickets.map((t) => this.toClientTicket(t)));
   }
 
@@ -160,7 +170,9 @@ export class TicketStore {
   readonly releaseCanSubmit = computed(() => this.releaseForm().version.trim().length > 0);
 
   seedSelectedTicket(ticket: SerializedTicket): void {
-    if (this.selectedTicketId() !== ticket.id) return; // route déjà passée à autre chose
+    // untracked: même raison que seedTickets — lu depuis l'effect de la vue
+    // détail, selectedTicketId ne doit pas en devenir une dépendance.
+    if (untracked(this.selectedTicketId) !== ticket.id) return; // route déjà passée à autre chose
     this.selectedTicket.set(this.toClientTicket(ticket));
   }
 

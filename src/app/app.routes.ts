@@ -1,9 +1,12 @@
 import { CanMatchFn, Routes } from '@angular/router';
+import { PROJECTS } from './data/tickets-seed';
 import { authReadyGuard } from './guards/auth.guard';
 import { projectTicketResolver } from './resolvers/project-tickets.resolver';
 import { ticketDetailResolver } from './resolvers/ticket-details.resolver';
 
-const VALID_PROJECT_IDS = new Set(['alveola', 'ludistes']);
+// Derived from PROJECTS so adding a project can't silently leave its routes
+// unreachable (the 'ticket' project was missing from the hand-written list).
+const VALID_PROJECT_IDS = new Set<string>(PROJECTS.map((p) => p.id));
 
 const isValidProjectId: CanMatchFn = (_route, segments) => VALID_PROJECT_IDS.has(segments[0]?.path);
 

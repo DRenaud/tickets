@@ -17,6 +17,24 @@ const TICKET_PATH = /^\/([^/]+)\/(ticket)\/([^/]+)\/?$/;
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
+// Cap the pre-render Firestore fetches: they are awaited before every SSR
+// render, so a slow/unreachable Firestore must degrade to a render without
+// initial data (the client subscription takes over) instead of hanging the
+// request — and piling up hung requests — on the VPS.
+const SSR_FETCH_TIMEOUT_MS = 3000;
+
+function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(
+        () => reject(new Error(`${label} timed out after ${SSR_FETCH_TIMEOUT_MS}ms`)),
+        SSR_FETCH_TIMEOUT_MS,
+      ).unref();
+    }),
+  ]);
+}
+
 /**
  * Example Express Rest API endpoints can be defined here.
  * Uncomment and define endpoints as necessary.
@@ -56,7 +74,9 @@ app.use(async (req, res, next) => {
 
   if (backlogPathMatch) {
     try {
-      context = { initialProjectTickets: await fetchProjectTickets(backlogPathMatch[1]) };
+      context = {
+        initialProjectTickets: await withTimeout(fetchProjectTickets(backlogPathMatch[1]), 'SSR backlog fetch'),
+      };
     } catch (error) {
       // SSR data-fetch failing shouldn't break the whole render — the
       // client-side Firestore subscription still takes over after hydration.
@@ -66,7 +86,12 @@ app.use(async (req, res, next) => {
 
   if (ticketPathMatch) {
     try {
-      context = { initialTicketDetail: await fetchTicketDetail(ticketPathMatch[1], ticketPathMatch[3]) };
+      context = {
+        initialTicketDetail: await withTimeout(
+          fetchTicketDetail(ticketPathMatch[1], ticketPathMatch[3]),
+          'SSR ticket fetch',
+        ),
+      };
     } catch (error) {
       console.error('SSR ticket fetch failed:', error);
     }

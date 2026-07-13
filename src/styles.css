@@ -7,4 +7,10 @@
  * Reuse these values in any new component.
  */
 
-@import 'tailwindcss';
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}

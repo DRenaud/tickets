@@ -1,6 +1,19 @@
 # FastTicket
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.0.5.
+A personal experiment built with **Angular 22** to try out **vibe coding** with [Claude](https://claude.ai/).
+
+I needed a simple way to track small tasks/tickets across a few side projects, and used it as an
+opportunity to see how far an AI-driven ("vibe coding") workflow could go on a real, working
+application — from scaffolding to SSR, auth, Firestore integration, and UI polish.
+
+This repo is shared mainly as a write-up of that experience: what worked well, what didn't, and
+what a fully AI-assisted development loop looks like in practice on an Angular codebase.
+
+## Stack
+
+- Angular 22 (standalone components, signals, SSR)
+- Firebase (Auth + Firestore) with a Firebase Admin SDK-backed SSR data path
+- Transloco for i18n (French / English)
 
 ## Development server
 
@@ -57,3 +70,7 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

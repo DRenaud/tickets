@@ -24,6 +24,7 @@ import {
   Category,
   Comment,
   NewTicketForm,
+  PRIORITY_RANK,
   PriorityFilter,
   ProjectId,
   SerializedTicket,
@@ -126,16 +127,30 @@ export class TicketStore {
 
   readonly theme = computed(() => getTheme(this.dark()));
 
-  readonly allBacklogList = computed(() => this.currentTickets().filter((t) => t.status === 'backlog'));
+  /**
+   * Tickets order first by upvote count (desc), then by priority (high →
+   * low) as a tiebreaker — matches the sort applied to every ticket view.
+   */
+  private sortTickets(tickets: Ticket[]): Ticket[] {
+    return [...tickets].sort((a, b) => {
+      const upvoteDiff = this.upvoteCount(b) - this.upvoteCount(a);
+      if (upvoteDiff !== 0) return upvoteDiff;
+      return PRIORITY_RANK[a.priority] - PRIORITY_RANK[b.priority];
+    });
+  }
+
+  readonly allBacklogList = computed(() => this.sortTickets(this.currentTickets().filter((t) => t.status === 'backlog')));
   readonly backlogList = computed(() => {
     const filter = this.filterPriority();
     const list = this.allBacklogList();
     return filter === 'all' ? list : list.filter((t) => t.priority === filter);
   });
-  readonly todoList = computed(() => this.currentTickets().filter((t) => t.status === 'todo'));
-  readonly inProgressList = computed(() => this.currentTickets().filter((t) => t.status === 'inprogress'));
-  readonly doneList = computed(() => this.currentTickets().filter((t) => t.status === 'done'));
-  readonly resolvedList = computed(() => this.currentTickets().filter((t) => t.status === 'resolved'));
+  readonly todoList = computed(() => this.sortTickets(this.currentTickets().filter((t) => t.status === 'todo')));
+  readonly inProgressList = computed(() =>
+    this.sortTickets(this.currentTickets().filter((t) => t.status === 'inprogress')),
+  );
+  readonly doneList = computed(() => this.sortTickets(this.currentTickets().filter((t) => t.status === 'done')));
+  readonly resolvedList = computed(() => this.sortTickets(this.currentTickets().filter((t) => t.status === 'resolved')));
 
   readonly resolvedGroups = computed(() => {
     const resolved = this.resolvedList();

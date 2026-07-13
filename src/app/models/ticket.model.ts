@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
 
 export type Priority = 'low' | 'medium' | 'high';
+export const PRIORITY_RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 export type Category = 'bug' | 'idea' | 'design' | 'tech';
 export type Status = 'backlog' | 'todo' | 'inprogress' | 'done' | 'resolved';
 export type ProjectId = 'alveola' | 'ludistes' | 'ticket';

@@ -54,6 +54,7 @@ export class TicketStore {
   readonly toast = signal<ToastMessage | null>(null);
 
   readonly selectedTicketId = signal<string | null>(null);
+  readonly lastListRoute = signal<'backlog' | 'kanban' | 'resolved'>('backlog');
   readonly sprintName = signal('Sprint 1');
   readonly sprintNumber = signal(1);
   readonly releaseModalOpen = signal(false);
@@ -334,6 +335,15 @@ export class TicketStore {
 
   openDetail(id: string): void {
     this.selectedTicketId.set(id);
+  }
+
+  // Called on every board navigation so the ticket detail's back link can
+  // return to whichever list the user actually came from, instead of
+  // always falling back to the default child route (backlog).
+  trackListRoute(url: string): void {
+    if (url.includes('/kanban')) this.lastListRoute.set('kanban');
+    else if (url.includes('/resolved')) this.lastListRoute.set('resolved');
+    else if (url.includes('/backlog')) this.lastListRoute.set('backlog');
   }
 
   closeDetail(): void {

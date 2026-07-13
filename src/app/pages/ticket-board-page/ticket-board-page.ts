@@ -2,7 +2,7 @@ import { Component, effect, inject, input } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { filter, map } from 'rxjs';
+import { filter, map, tap } from 'rxjs';
 import { AppHeader } from '../../components/app-header/app-header';
 import { LoginModal } from '../../components/login-modal/login-modal';
 import { NewTicketModal } from '../../components/new-ticket-modal/new-ticket-modal';
@@ -40,7 +40,8 @@ export class TicketBoardPage {
   protected readonly isTicketDetailRoute = toSignal(
     this.router.events.pipe(
       filter((e): e is NavigationEnd => e instanceof NavigationEnd),
-      map(() => this.router.url.includes('/ticket/')),
+      tap((e) => this.store.trackListRoute(e.urlAfterRedirects)),
+      map((e) => e.urlAfterRedirects.includes('/ticket/')),
     ),
     { initialValue: this.router.url.includes('/ticket/') },
   );

@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TicketComments } from '../ticket-comments/ticket-comments';
 import { TicketSidebar } from '../ticket-sidebar/ticket-sidebar';
@@ -23,7 +23,6 @@ const STAGE_DEFS = [
 export class TicketDetailView {
   protected readonly store = inject(TicketStore);
   private readonly router = inject(Router);
-  private readonly route = inject(ActivatedRoute);
   protected readonly ticket = this.store.selectedTicket;
 
   readonly ticketId = input.required<string>();
@@ -56,7 +55,7 @@ export class TicketDetailView {
   });
 
   back(): void {
-    this.router.navigate(['..'], { relativeTo: this.route });
+    this.router.navigate(['/', this.store.project(), this.store.lastListRoute()]);
   }
 
   startEditTicket(): void {

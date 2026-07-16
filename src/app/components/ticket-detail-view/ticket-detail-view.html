@@ -13,6 +13,9 @@
       } @else {
         <div class="title-row">
           <div class="title">{{ t.title }}</div>
+          @if (t.locked) {
+            <span class="locked-badge">🔒 {{ 'detail.locked' | transloco }}</span>
+          }
           @if (store.canEditTicket(t)) {
             <button
               type="button"
@@ -43,6 +46,36 @@
           (input)="editDescriptionDraft.set($any($event.target).value)"
           [attr.aria-label]="'detail.editDescription' | transloco"
         ></textarea>
+        <div class="row-fields">
+          <div class="field-group">
+            <div class="field-label">{{ 'detail.priority' | transloco }}</div>
+            <div class="pills">
+              @for (p of priorityOptions; track p.key) {
+                <button
+                  type="button"
+                  class="priority-pill"
+                  [class.priority-pill-active]="editPriorityDraft() === p.key"
+                  [class]="'prio-' + p.key"
+                  (click)="setEditPriority(p.key)"
+                >{{ p.labelKey | transloco }}</button>
+              }
+            </div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">{{ 'detail.category' | transloco }}</div>
+            <div class="pills">
+              @for (c of categoryOptions; track c) {
+                <button
+                  type="button"
+                  class="category-pill"
+                  [class.category-pill-active]="editCategoryDraft() === c"
+                  [attr.aria-label]="categoryMeta(c).labelKey | transloco"
+                  (click)="setEditCategory(c)"
+                >{{ categoryMeta(c).emoji }}</button>
+              }
+            </div>
+          </div>
+        </div>
         <div class="edit-actions">
           <button type="button" class="cancel-btn" (click)="cancelEditTicket()">{{ 'common.cancel' | transloco }}</button>
           <button type="button" class="submit-btn" (click)="saveEditTicket()">{{ 'common.save' | transloco }}</button>

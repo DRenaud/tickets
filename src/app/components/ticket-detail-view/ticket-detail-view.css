@@ -61,6 +61,19 @@
   color: var(--accent);
 }
 
+.locked-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--amber);
+  background: color-mix(in oklch, var(--amber) 18%, transparent);
+  flex: none;
+}
+
 .title-input {
   width: 100%;
   font-family: 'Sora', sans-serif;
@@ -98,6 +111,76 @@
 .description-input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.row-fields {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.field-group {
+  flex: 1;
+}
+
+.field-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.pills {
+  display: flex;
+  gap: 6px;
+}
+
+.priority-pill {
+  flex: 1;
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+}
+
+.priority-pill.prio-low.priority-pill-active {
+  border-color: var(--mint);
+  background: var(--mint);
+  color: #fff;
+}
+
+.priority-pill.prio-medium.priority-pill-active {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #fff;
+}
+
+.priority-pill.prio-high.priority-pill-active {
+  border-color: var(--coral);
+  background: var(--coral);
+  color: #fff;
+}
+
+.category-pill {
+  flex: 1;
+  text-align: center;
+  padding: 6px 2px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: transparent;
+}
+
+.category-pill-active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 
 .edit-actions {
@@ -249,5 +332,18 @@
 
   .stage-label {
     font-size: 10px;
+  }
+
+  .row-fields {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .field-group {
+    margin-bottom: 14px;
+  }
+
+  .pills {
+    flex-wrap: wrap;
   }
 }

@@ -32,6 +32,7 @@ export interface Ticket {
   comments?: Comment[];
   attachments?: string[];
   upvotes?: string[];
+  locked?: boolean;
 }
 
 /**

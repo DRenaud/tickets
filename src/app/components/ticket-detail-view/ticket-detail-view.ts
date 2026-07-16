@@ -4,7 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TicketComments } from '../ticket-comments/ticket-comments';
 import { TicketSidebar } from '../ticket-sidebar/ticket-sidebar';
 import { TicketStore } from '../../services/ticket-store';
-import type { SerializedTicket } from '../../models/ticket.model';
+import type { Category, Priority, SerializedTicket } from '../../models/ticket.model';
 
 const STAGE_DEFS = [
   { key: 'backlog', labelKey: 'status.backlog' },
@@ -31,6 +31,15 @@ export class TicketDetailView {
   protected readonly editingTicket = signal(false);
   protected readonly editTitleDraft = signal('');
   protected readonly editDescriptionDraft = signal('');
+  protected readonly editPriorityDraft = signal<Priority>('medium');
+  protected readonly editCategoryDraft = signal<Category>('bug');
+
+  protected readonly priorityOptions: { key: Priority; labelKey: string }[] = [
+    { key: 'low', labelKey: 'priority.low' },
+    { key: 'medium', labelKey: 'priority.medium' },
+    { key: 'high', labelKey: 'priority.high' },
+  ];
+  protected readonly categoryOptions: Category[] = ['bug', 'idea', 'design', 'tech'];
 
   constructor() {
     effect(() => {
@@ -63,6 +72,8 @@ export class TicketDetailView {
     if (!t) return;
     this.editTitleDraft.set(t.title);
     this.editDescriptionDraft.set(t.description ?? '');
+    this.editPriorityDraft.set(t.priority);
+    this.editCategoryDraft.set(t.category);
     this.editingTicket.set(true);
   }
 
@@ -70,10 +81,27 @@ export class TicketDetailView {
     this.editingTicket.set(false);
   }
 
+  setEditPriority(p: Priority): void {
+    this.editPriorityDraft.set(p);
+  }
+
+  setEditCategory(c: Category): void {
+    this.editCategoryDraft.set(c);
+  }
+
+  categoryMeta(c: Category) {
+    return this.store.categoryMeta(c);
+  }
+
   saveEditTicket(): void {
     const t = this.ticket();
     if (!t) return;
-    this.store.updateTicketDetails(t.id, { title: this.editTitleDraft(), description: this.editDescriptionDraft() });
+    this.store.updateTicketDetails(t.id, {
+      title: this.editTitleDraft(),
+      description: this.editDescriptionDraft(),
+      priority: this.editPriorityDraft(),
+      category: this.editCategoryDraft(),
+    });
     this.editingTicket.set(false);
   }
 }

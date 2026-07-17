@@ -106,7 +106,11 @@
     "editTicket": "Edit ticket",
     "editTitle": "Ticket title",
     "editDescription": "Ticket description",
-    "editComment": "Edit comment"
+    "editComment": "Edit comment",
+    "locked": "Locked",
+    "lockTicket": "🔒 Lock ticket",
+    "unlockTicket": "🔓 Unlock ticket",
+    "returnToBacklog": "↩️ Move back to backlog"
   },
   "release": {
     "title": "Release-it 🚀",

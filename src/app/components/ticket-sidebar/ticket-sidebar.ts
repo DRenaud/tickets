@@ -35,6 +35,8 @@ export class TicketSidebar {
     return status === 'todo' || status === 'inprogress';
   });
   protected readonly canAddToSprint = computed(() => this.ticket().status === 'backlog');
+  protected readonly canReturnToBacklog = computed(() => this.ticket().status !== 'backlog');
+  protected readonly isLocked = computed(() => !!this.ticket().locked);
   protected readonly advanceLabelKey = computed(() =>
     this.ticket().status === 'todo' ? 'detail.moveToInProgress' : 'detail.markDone',
   );
@@ -69,6 +71,14 @@ export class TicketSidebar {
 
   addToSprint(): void {
     this.store.addFromBacklogToSprint(this.ticket().id);
+  }
+
+  returnToBacklog(): void {
+    this.store.returnToBacklog(this.ticket().id);
+  }
+
+  toggleLock(): void {
+    this.store.toggleLock(this.ticket().id);
   }
 
   deleteTicket(): void {

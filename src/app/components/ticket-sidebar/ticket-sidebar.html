@@ -105,6 +105,17 @@
     @if (store.isAdmin() && canAddToSprint()) {
       <button type="button" class="action-btn action-btn-outline" (click)="addToSprint()">{{ 'backlog.addToSprint' | transloco }}</button>
     }
+    @if (store.isAdmin() && canReturnToBacklog()) {
+      <button type="button" class="action-btn action-btn-outline" (click)="returnToBacklog()">{{ 'detail.returnToBacklog' | transloco }}</button>
+    }
+    @if (store.isAdmin()) {
+      <button
+        type="button"
+        class="action-btn action-btn-outline"
+        [attr.aria-pressed]="isLocked()"
+        (click)="toggleLock()"
+      >{{ (isLocked() ? 'detail.unlockTicket' : 'detail.lockTicket') | transloco }}</button>
+    }
     @if (store.isAdmin()) {
       <button type="button" class="action-btn action-btn-danger" (click)="deleteTicket()">{{ 'detail.deleteTicket' | transloco }}</button>
     }

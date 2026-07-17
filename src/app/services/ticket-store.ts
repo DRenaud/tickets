@@ -24,6 +24,7 @@ import {
   Category,
   Comment,
   NewTicketForm,
+  Priority,
   PRIORITY_RANK,
   PriorityFilter,
   ProjectId,
@@ -410,8 +411,10 @@ export class TicketStore {
   // a real user can additionally edit their own — matched by uid, not the
   // createdBy/author display string (which isn't a reliable identity: two
   // people can share the same initials). Tickets created before createdByUid
-  // existed have no uid on file, so only admin can edit those.
+  // existed have no uid on file, so only admin can edit those. A locked
+  // ticket can only be edited by an admin, regardless of ownership.
   canEditTicket(ticket: Ticket): boolean {
+    if (ticket.locked) return this.isAdmin();
     return this.isAdmin() || (this.isRealUser() && !!ticket.createdByUid && ticket.createdByUid === this.auth.user()?.uid);
   }
 
@@ -419,7 +422,10 @@ export class TicketStore {
     return this.isAdmin() || (this.isRealUser() && !!comment.authorUid && comment.authorUid === this.auth.user()?.uid);
   }
 
-  updateTicketDetails(id: string, changes: { title: string; description: string }): void {
+  updateTicketDetails(
+    id: string,
+    changes: { title: string; description: string; priority: Priority; category: Category },
+  ): void {
     const ticket = this.currentTickets().find((t) => t.id === id);
     if (!ticket || !this.canEditTicket(ticket)) {
       this.showToast('toast.notAuthorized');
@@ -427,7 +433,30 @@ export class TicketStore {
     }
     const title = changes.title.trim();
     if (!title) return;
-    this.updateTicket(id, { title, description: changes.description.trim() });
+    this.updateTicket(id, {
+      title,
+      description: changes.description.trim(),
+      priority: changes.priority,
+      category: changes.category,
+    });
+  }
+
+  toggleLock(id: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    const ticket = this.currentTickets().find((t) => t.id === id);
+    if (!ticket) return;
+    this.updateTicket(id, { locked: !ticket.locked });
+  }
+
+  returnToBacklog(id: string): void {
+    if (!this.isAdmin()) {
+      this.showToast('toast.notAuthorized');
+      return;
+    }
+    this.updateTicket(id, { status: 'backlog' });
   }
 
   updateComment(index: number, text: string): void {

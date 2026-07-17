@@ -35,7 +35,7 @@
                 [attr.aria-label]="categoryMeta(c).labelKey | transloco"
                 [attr.data-tooltip]="categoryMeta(c).labelKey | transloco"
                 (click)="setCategory(c)"
-              >{{ categoryMeta(c).emoji }}</button>
+              >{{ categoryMeta(c).emoji }}<span class="category-label">{{ categoryMeta(c).labelKey | transloco }}</span></button>
             }
           </div>
         </div>

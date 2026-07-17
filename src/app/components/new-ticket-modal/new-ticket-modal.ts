@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { form, FormField } from '@angular/forms/signals';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { Category, NewTicketForm, Priority } from '../../models/ticket.model';
+import { Category, NewTicketForm } from '../../models/ticket.model';
 import { TicketStore } from '../../services/ticket-store';
 
 function emptyForm(): NewTicketForm {
@@ -20,23 +20,13 @@ export class NewTicketModal {
   private readonly model = signal<NewTicketForm>(emptyForm());
   protected readonly ticketForm = form(this.model);
 
-  protected readonly priorityOptions: { key: Priority; labelKey: string }[] = [
-    { key: 'low', labelKey: 'priority.low' },
-    { key: 'medium', labelKey: 'priority.medium' },
-    { key: 'high', labelKey: 'priority.high' },
-  ];
   protected readonly categoryOptions: Category[] = ['bug', 'idea', 'design', 'tech'];
 
-  protected readonly priority = computed(() => this.model().priority);
   protected readonly category = computed(() => this.model().category);
   protected readonly canSubmit = computed(() => this.model().title.trim().length > 0);
 
   categoryMeta(c: Category) {
     return this.store.categoryMeta(c);
-  }
-
-  setPriority(p: Priority): void {
-    this.model.update((m) => ({ ...m, priority: p }));
   }
 
   setCategory(c: Category): void {

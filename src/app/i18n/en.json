@@ -125,7 +125,6 @@
     "titlePlaceholder": "The button is misbehaving…",
     "description": "Description",
     "descriptionPlaceholder": "Details, steps to reproduce…",
-    "priority": "Priority",
     "category": "Category",
     "submit": "Create ticket 🚀"
   },

@@ -25,20 +25,6 @@
 
       <div class="row-fields">
         <div class="field-group">
-          <div class="field-label">{{ 'newTicket.priority' | transloco }}</div>
-          <div class="pills">
-            @for (p of priorityOptions; track p.key) {
-              <button
-                type="button"
-                class="priority-pill"
-                [class.priority-pill-active]="priority() === p.key"
-                [class]="'prio-' + p.key"
-                (click)="setPriority(p.key)"
-              >{{ p.labelKey | transloco }}</button>
-            }
-          </div>
-        </div>
-        <div class="field-group">
           <div class="field-label">{{ 'newTicket.category' | transloco }}</div>
           <div class="pills">
             @for (c of categoryOptions; track c) {
@@ -47,6 +33,7 @@
                 class="category-pill"
                 [class.category-pill-active]="category() === c"
                 [attr.aria-label]="categoryMeta(c).labelKey | transloco"
+                [attr.data-tooltip]="categoryMeta(c).labelKey | transloco"
                 (click)="setCategory(c)"
               >{{ categoryMeta(c).emoji }}</button>
             }

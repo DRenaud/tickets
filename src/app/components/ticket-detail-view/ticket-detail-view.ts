@@ -52,6 +52,11 @@ export class TicketDetailView {
     });
   }
 
+  protected readonly canEdit = computed(() => {
+    const t = this.ticket();
+    return !!t && this.store.canEditTicket(t);
+  });
+
   protected readonly stages = computed(() => {
     const ticket = this.ticket();
     if (!ticket) return [];
@@ -75,6 +80,12 @@ export class TicketDetailView {
     this.editPriorityDraft.set(t.priority);
     this.editCategoryDraft.set(t.category);
     this.editingTicket.set(true);
+  }
+
+  onEditableFieldKeydown(event: KeyboardEvent): void {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    this.startEditTicket();
   }
 
   cancelEditTicket(): void {

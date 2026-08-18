@@ -97,6 +97,38 @@
   gap: 6px;
 }
 
+.priority-pill {
+  flex: 1;
+  text-align: center;
+  padding: 6px 4px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: inherit;
+}
+
+.priority-pill.prio-low.priority-pill-active {
+  border-color: var(--mint);
+  background: var(--mint);
+  color: #fff;
+}
+
+.priority-pill.prio-medium.priority-pill-active {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #fff;
+}
+
+.priority-pill.prio-high.priority-pill-active {
+  border-color: var(--coral);
+  background: var(--coral);
+  color: #fff;
+}
+
 .category-pill {
   position: relative;
   flex: 1;

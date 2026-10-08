@@ -1,25 +1,14 @@
-import { type ServiceAccount, cert, getApps, initializeApp } from 'firebase-admin/app';
-import { type DocumentData, type Firestore, Timestamp, getFirestore } from 'firebase-admin/firestore';
+import { type DocumentData, Timestamp } from 'firebase-admin/firestore';
+import { getAdminFirestore } from '../app/services/firebase-admin.server';
+import { PROJECTS } from '../app/data/tickets-seed';
+import { type Category, type Priority, PRIORITY_RANK, type ProjectId, type Status } from '../app/models/ticket.model';
 
-// Mirrors src/app/models/ticket.model.ts and src/app/data/tickets-seed.ts —
-// duplicated rather than imported, since the app's model file pulls in the
-// browser Firebase SDK at runtime.
-export const PROJECT_IDS = ['alveola', 'ludistes', 'ticket'] as const;
-export const PROJECT_LABELS: Record<ProjectId, string> = {
-  alveola: 'Alvéola',
-  ludistes: 'Ludistes Charentais',
-  ticket: 'Ticketing',
-};
-export const PRIORITIES = ['low', 'medium', 'high'] as const;
-export const CATEGORIES = ['bug', 'idea', 'design', 'tech'] as const;
-export const STATUSES = ['backlog', 'todo', 'inprogress', 'done', 'resolved'] as const;
-
-export type ProjectId = (typeof PROJECT_IDS)[number];
-export type Priority = (typeof PRIORITIES)[number];
-export type Category = (typeof CATEGORIES)[number];
-export type Status = (typeof STATUSES)[number];
-
-const PRIORITY_RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
+// Runtime lists of the model's union types, needed for the MCP tools' input
+// schemas. `satisfies` makes the compiler flag them if the model changes.
+export const PROJECT_IDS = PROJECTS.map((p) => p.id) as [ProjectId, ...ProjectId[]];
+export const PRIORITIES = ['low', 'medium', 'high'] as const satisfies readonly Priority[];
+export const CATEGORIES = ['bug', 'idea', 'design', 'tech'] as const satisfies readonly Category[];
+export const STATUSES = ['backlog', 'todo', 'inprogress', 'done', 'resolved'] as const satisfies readonly Status[];
 
 export interface TicketComment {
   author: string;
@@ -45,22 +34,10 @@ export interface TicketView {
   comments: TicketComment[];
 }
 
-/**
- * Admin SDK access: bypasses firestore.rules, so this module must only ever
- * read — the MCP server has no auth and is meant to be public. Same SERVICE_ACCOUNT env var as
- * the SSR server (src/app/services/firebase-admin.server.ts).
- */
-function db(): Firestore {
-  if (!getApps().length) {
-    const raw = process.env['SERVICE_ACCOUNT'];
-    if (!raw) throw new Error('SERVICE_ACCOUNT env var is missing (Firebase service account JSON).');
-    initializeApp({ credential: cert(JSON.parse(raw) as ServiceAccount) });
-  }
-  return getFirestore();
-}
-
+// Read-only on purpose: Admin SDK access bypasses firestore.rules, and the
+// /mcp endpoint has no auth. Never add a write here without adding auth.
 function ticketsCollection(projectId: ProjectId) {
-  return db().collection('projects').doc(projectId).collection('tickets');
+  return getAdminFirestore().collection('projects').doc(projectId).collection('tickets');
 }
 
 function toIso(value: unknown): string {

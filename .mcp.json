@@ -1,11 +1,8 @@
 {
   "mcpServers": {
     "fast-ticket": {
-      "command": "node",
-      "args": ["mcp/src/index.ts"],
-      "env": {
-        "SERVICE_ACCOUNT": "${SERVICE_ACCOUNT}"
-      }
+      "type": "http",
+      "url": "http://localhost:4000/mcp"
     }
   }
 }

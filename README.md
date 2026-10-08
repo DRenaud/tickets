@@ -14,7 +14,7 @@ what a fully AI-assisted development loop looks like in practice on an Angular c
 - Angular 22 (standalone components, signals, SSR)
 - Firebase (Auth + Firestore) with a Firebase Admin SDK-backed SSR data path
 - Transloco for i18n (French / English)
-- An [MCP server](mcp/README.md) to read tickets from an AI assistant (read-only)
+- A public, read-only [MCP endpoint](#mcp-server) to read tickets from an AI assistant
 
 ## Development server
 
@@ -25,6 +25,31 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## MCP server
+
+The Express server exposes a public [MCP](https://modelcontextprotocol.io) endpoint at `/mcp`
+(Streamable HTTP, stateless) so AI assistants (Claude Code, Claude Desktop, …) can read tickets:
+
+| Tool            | Description                                                                  |
+| --------------- | ---------------------------------------------------------------------------- |
+| `list_projects` | Lists the projects.                                                          |
+| `list_tickets`  | Lists a project's tickets, optionally filtered by status/priority/category. |
+| `get_ticket`    | Returns one ticket with its description and comments.                       |
+
+It is **read-only and has no auth**: anyone can read every ticket of every project, including comments
+(Firebase uids are never exposed). The tools read Firestore with the Admin SDK, which bypasses
+`firestore.rules` — never add a tool that writes without adding auth first. Requests are rate-limited
+to 60 per minute per IP. Code lives in `src/mcp/`.
+
+To use it from Claude Code:
+
+```bash
+claude mcp add --transport http fast-ticket https://<your-domain>/mcp
+```
+
+The repo's `.mcp.json` points at `http://localhost:4000/mcp` for local development
+(`npm run build && npm run serve:ssr:fast-ticket`).
 
 ## Code scaffolding
 

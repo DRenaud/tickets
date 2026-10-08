@@ -1,7 +1,7 @@
 # FastTicket MCP server
 
 An [MCP](https://modelcontextprotocol.io) server that lets an AI assistant (Claude Code, Claude Desktop, …)
-read and manage FastTicket tickets directly in Firestore.
+read FastTicket tickets directly from Firestore. It is **read-only** and needs no auth.
 
 ## Tools
 
@@ -10,16 +10,15 @@ read and manage FastTicket tickets directly in Firestore.
 | `list_projects` | Lists the projects (`alveola`, `ludistes`, `ticket`).                    |
 | `list_tickets`  | Lists a project's tickets, optionally filtered by status/priority/category. |
 | `get_ticket`    | Returns one ticket with its description and comments.                    |
-| `create_ticket` | Creates a ticket in the backlog.                                         |
-| `update_ticket` | Updates title, description, status, priority, category, PR link, time spent, lock. |
-| `add_comment`   | Adds a comment to a ticket.                                              |
 
-Deleting tickets is intentionally not exposed.
+No tool writes to Firestore (no create, update, comment or delete): that is what makes it safe to use without auth.
 
 ## Security
 
-The server uses the **Firebase Admin SDK**: it bypasses `firestore.rules` and acts with admin rights on
-every project. It runs locally over stdio only — never expose it publicly.
+The server uses the **Firebase Admin SDK**, which bypasses `firestore.rules`. Safety comes from the code
+exposing read tools only — never add a write tool without adding auth first. Anyone using it can read
+every ticket of every project (titles, descriptions, comments with author initials); Firebase uids are
+not exposed.
 
 ## Setup
 
@@ -33,7 +32,6 @@ npm install
 Environment variables:
 
 - `SERVICE_ACCOUNT` (required): the Firebase service account JSON — the same value as the SSR server's `.env`.
-- `TICKETS_AUTHOR` (optional): initials shown as author of created tickets/comments (default `MCP`).
 
 ### Claude Code
 
@@ -53,7 +51,7 @@ claude
     "fast-ticket": {
       "command": "node",
       "args": ["/absolute/path/to/tickets/mcp/src/index.ts"],
-      "env": { "SERVICE_ACCOUNT": "{…service account JSON…}", "TICKETS_AUTHOR": "AI" }
+      "env": { "SERVICE_ACCOUNT": "{…service account JSON…}" }
     }
   }
 }

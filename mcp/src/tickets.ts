@@ -1,5 +1,5 @@
 import { type ServiceAccount, cert, getApps, initializeApp } from 'firebase-admin/app';
-import { type DocumentData, FieldValue, type Firestore, Timestamp, getFirestore } from 'firebase-admin/firestore';
+import { type DocumentData, type Firestore, Timestamp, getFirestore } from 'firebase-admin/firestore';
 
 // Mirrors src/app/models/ticket.model.ts and src/app/data/tickets-seed.ts —
 // duplicated rather than imported, since the app's model file pulls in the
@@ -45,20 +45,9 @@ export interface TicketView {
   comments: TicketComment[];
 }
 
-export interface TicketUpdate {
-  title?: string;
-  description?: string;
-  status?: Status;
-  priority?: Priority;
-  category?: Category;
-  prLink?: string;
-  timeSpentMinutes?: number;
-  locked?: boolean;
-}
-
 /**
- * Admin SDK access: bypasses firestore.rules, so whoever runs this server
- * acts with admin rights on every project. Same SERVICE_ACCOUNT env var as
+ * Admin SDK access: bypasses firestore.rules, so this module must only ever
+ * read — the MCP server has no auth and is meant to be public. Same SERVICE_ACCOUNT env var as
  * the SSR server (src/app/services/firebase-admin.server.ts).
  */
 function db(): Firestore {
@@ -69,8 +58,6 @@ function db(): Firestore {
   }
   return getFirestore();
 }
-
-const author = (): string => process.env['TICKETS_AUTHOR'] || 'MCP';
 
 function ticketsCollection(projectId: ProjectId) {
   return db().collection('projects').doc(projectId).collection('tickets');
@@ -129,42 +116,4 @@ export async function listTickets(
 export async function getTicket(projectId: ProjectId, ticketId: string): Promise<TicketView | null> {
   const doc = await ticketsCollection(projectId).doc(ticketId).get();
   return doc.exists ? toView(doc.id, doc.data()!) : null;
-}
-
-export async function createTicket(
-  projectId: ProjectId,
-  input: { title: string; description?: string; priority: Priority; category: Category },
-): Promise<TicketView> {
-  const ref = await ticketsCollection(projectId).add({
-    title: input.title.trim(),
-    description: input.description?.trim() ?? '',
-    status: 'backlog',
-    priority: input.priority,
-    category: input.category,
-    createdBy: author(),
-    createdAt: FieldValue.serverTimestamp(),
-  });
-  return (await getTicket(projectId, ref.id))!;
-}
-
-export async function updateTicket(
-  projectId: ProjectId,
-  ticketId: string,
-  changes: TicketUpdate,
-): Promise<TicketView | null> {
-  const ref = ticketsCollection(projectId).doc(ticketId);
-  if (!(await ref.get()).exists) return null;
-  const update = Object.fromEntries(Object.entries(changes).filter(([, v]) => v !== undefined));
-  if (Object.keys(update).length) await ref.update(update);
-  return getTicket(projectId, ticketId);
-}
-
-export async function addComment(projectId: ProjectId, ticketId: string, text: string): Promise<TicketView | null> {
-  const ref = ticketsCollection(projectId).doc(ticketId);
-  if (!(await ref.get()).exists) return null;
-  // serverTimestamp() isn't allowed inside array elements, hence Timestamp.now().
-  await ref.update({
-    comments: FieldValue.arrayUnion({ author: author(), text: text.trim(), createdAt: Timestamp.now() }),
-  });
-  return getTicket(projectId, ticketId);
 }

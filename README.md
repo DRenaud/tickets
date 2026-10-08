@@ -14,6 +14,7 @@ what a fully AI-assisted development loop looks like in practice on an Angular c
 - Angular 22 (standalone components, signals, SSR)
 - Firebase (Auth + Firestore) with a Firebase Admin SDK-backed SSR data path
 - Transloco for i18n (French / English)
+- An [MCP server](mcp/README.md) to manage tickets from an AI assistant
 
 ## Development server
 

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "fast-ticket": {
+      "command": "node",
+      "args": ["mcp/src/index.ts"],
+      "env": {
+        "SERVICE_ACCOUNT": "${SERVICE_ACCOUNT}",
+        "TICKETS_AUTHOR": "${TICKETS_AUTHOR:-AI}"
+      }
+    }
+  }
+}

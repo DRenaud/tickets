@@ -1,0 +1,25 @@
+{
+  "name": "fast-ticket-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing FastTicket tickets (Firestore) to AI assistants",
+  "author": "Damien Renaud <contact@damien-renaud.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.1",
+    "firebase-admin": "^14.5.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "typescript": "~6.0.2"
+  }
+}

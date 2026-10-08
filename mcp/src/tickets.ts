@@ -21,6 +21,12 @@ export type Status = (typeof STATUSES)[number];
 
 const PRIORITY_RANK: Record<Priority, number> = { high: 0, medium: 1, low: 2 };
 
+export interface TicketComment {
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
 export interface TicketView {
   id: string;
   title: string;
@@ -36,6 +42,7 @@ export interface TicketView {
   timeSpentMinutes?: number;
   upvotes: number;
   locked: boolean;
+  comments: TicketComment[];
 }
 
 /**
@@ -60,9 +67,8 @@ function toIso(value: unknown): string {
   return value instanceof Timestamp ? value.toDate().toISOString() : '';
 }
 
-// Comments are deliberately left out: the server is public and they may
-// hold discussions that shouldn't leave the app.
 function toView(id: string, data: DocumentData): TicketView {
+  const comments = (data['comments'] as { author: string; text: string; createdAt: unknown }[] | undefined) ?? [];
   return {
     id,
     title: data['title'],
@@ -78,6 +84,7 @@ function toView(id: string, data: DocumentData): TicketView {
     timeSpentMinutes: data['timeSpentMinutes'],
     upvotes: (data['upvotes'] as string[] | undefined)?.length ?? 0,
     locked: !!data['locked'],
+    comments: comments.map((c) => ({ author: c.author, text: c.text, createdAt: toIso(c.createdAt) })),
   };
 }
 

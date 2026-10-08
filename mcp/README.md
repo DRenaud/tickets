@@ -9,7 +9,7 @@ read FastTicket tickets directly from Firestore. It is **read-only** and needs n
 | --------------- | ------------------------------------------------------------------------ |
 | `list_projects` | Lists the projects (`alveola`, `ludistes`, `ticket`).                    |
 | `list_tickets`  | Lists a project's tickets, optionally filtered by status/priority/category. |
-| `get_ticket`    | Returns one ticket with its description and comments.                    |
+| `get_ticket`    | Returns one ticket with its description.                                |
 
 No tool writes to Firestore (no create, update, comment or delete): that is what makes it safe to use without auth.
 
@@ -17,8 +17,8 @@ No tool writes to Firestore (no create, update, comment or delete): that is what
 
 The server uses the **Firebase Admin SDK**, which bypasses `firestore.rules`. Safety comes from the code
 exposing read tools only — never add a write tool without adding auth first. Anyone using it can read
-every ticket of every project (titles, descriptions, comments with author initials); Firebase uids are
-not exposed.
+every ticket of every project (titles, descriptions, statuses…). Comments and Firebase uids are never
+exposed.
 
 ## Setup
 

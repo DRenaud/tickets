@@ -59,7 +59,7 @@ server.registerTool(
   'get_ticket',
   {
     title: 'Get ticket',
-    description: 'Returns a ticket with its full description and comments.',
+    description: 'Returns a ticket with its full description.',
     inputSchema: { projectId, ticketId },
     annotations: { readOnlyHint: true },
   },

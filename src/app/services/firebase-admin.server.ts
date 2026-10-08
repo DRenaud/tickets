@@ -17,7 +17,7 @@ function getAdminApp(): App {
  * Server-only: returns a Firestore instance with Admin privileges (bypasses firestore.rules — this must never run in the browser).
  * @returns Firestore instance with Admin privileges
  */
-function getAdminFirestore(): Firestore {
+export function getAdminFirestore(): Firestore {
   return getFirestore(getAdminApp());
 }
 

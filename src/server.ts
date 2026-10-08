@@ -7,6 +7,7 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 import { fetchProjectTickets, fetchTicketDetail } from './app/services/firebase-admin.server';
+import { mcpRouter } from './mcp/mcp-router.server';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 // The BACKLOG_PATH regex matches the /:projectId/backlog, /:projectId/kanban, and /:projectId/resolved routes.
@@ -35,17 +36,15 @@ function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
   ]);
 }
 
+// Behind the VPS reverse proxy, req.ip must come from X-Forwarded-For — the
+// /mcp rate limiter keys on it. Only proxies on a private network are
+// trusted, so a client can't spoof its IP by sending the header itself.
+app.set('trust proxy', 'loopback, linklocal, uniquelocal');
+
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Public read-only MCP endpoint, see src/mcp/mcp-router.server.ts.
  */
+app.use('/mcp', mcpRouter);
 
 /**
  * Serve static files from /browser

@@ -14,7 +14,7 @@ what a fully AI-assisted development loop looks like in practice on an Angular c
 - Angular 22 (standalone components, signals, SSR)
 - Firebase (Auth + Firestore) with a Firebase Admin SDK-backed SSR data path
 - Transloco for i18n (French / English)
-- A public, read-only [MCP endpoint](#mcp-server) to read tickets from an AI assistant
+- An [MCP endpoint](#mcp-server) to read tickets (public) and manage tickets, sprints and releases (token-protected) from an AI assistant
 
 ## Development server
 
@@ -37,19 +37,37 @@ The Express server exposes a public [MCP](https://modelcontextprotocol.io) endpo
 | `list_tickets`  | Lists a project's tickets, optionally filtered by status/priority/category. |
 | `get_ticket`    | Returns one ticket with its description and comments.                       |
 
-It is **read-only and has no auth**: anyone can read every ticket of every project, including comments
-(Firebase uids are never exposed). The tools read Firestore with the Admin SDK, which bypasses
-`firestore.rules` — never add a tool that writes without adding auth first. Requests are rate-limited
+Reads are **public**: anyone can read every ticket of every project, including comments (Firebase uids are
+never exposed). Write tools are only exposed to requests carrying `Authorization: Bearer <MCP_ADMIN_TOKEN>`:
+
+| Tool             | Description                                                                              |
+| ---------------- | ---------------------------------------------------------------------------------------- |
+| `create_ticket`  | Creates a ticket in a project's backlog.                                                 |
+| `update_ticket`  | Edits a ticket's fields and/or moves it (backlog → todo → inprogress → done).            |
+| `get_sprint`     | Current sprint number/name and ticket count per status.                                  |
+| `rename_sprint`  | Renames the current sprint.                                                              |
+| `release_sprint` | Turns every `done` ticket into `resolved` with a version and starts the next sprint.     |
+
+Set a long random secret in the server's environment (e.g. `.env`) to enable them, for instance with
+`openssl rand -hex 32`:
+
+```bash
+MCP_ADMIN_TOKEN=<secret>
+```
+
+Without `MCP_ADMIN_TOKEN` the endpoint stays read-only; a wrong token is rejected with a 401. The tools use
+the Admin SDK, which bypasses `firestore.rules`, so serve `/mcp` over HTTPS only. Requests are rate-limited
 to 60 per minute per IP. Code lives in `src/mcp/`.
 
 To use it from Claude Code:
 
 ```bash
-claude mcp add --transport http fast-ticket https://<your-domain>/mcp
+claude mcp add --transport http fast-ticket https://<your-domain>/mcp \
+  --header "Authorization: Bearer $MCP_ADMIN_TOKEN"
 ```
 
 The repo's `.mcp.json` points at `http://localhost:4000/mcp` for local development
-(`npm run build && npm run serve:ssr:fast-ticket`).
+(`npm run build && npm run serve:ssr:fast-ticket`) and reads the token from your `MCP_ADMIN_TOKEN` environment variable.
 
 ## Code scaffolding
 

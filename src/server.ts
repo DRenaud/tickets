@@ -42,7 +42,7 @@ function withTimeout<T>(promise: Promise<T>, label: string): Promise<T> {
 app.set('trust proxy', 'loopback, linklocal, uniquelocal');
 
 /**
- * Public read-only MCP endpoint, see src/mcp/mcp-router.server.ts.
+ * MCP endpoint (public reads, bearer-token writes), see src/mcp/mcp-router.server.ts.
  */
 app.use('/mcp', mcpRouter);
 

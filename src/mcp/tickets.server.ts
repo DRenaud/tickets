@@ -1,4 +1,4 @@
-import { type DocumentData, Timestamp } from 'firebase-admin/firestore';
+import { type DocumentData, FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getAdminFirestore } from '../app/services/firebase-admin.server';
 import { PROJECTS } from '../app/data/tickets-seed';
 import { type Category, type Priority, PRIORITY_RANK, type ProjectId, type Status } from '../app/models/ticket.model';
@@ -34,8 +34,9 @@ export interface TicketView {
   comments: TicketComment[];
 }
 
-// Read-only on purpose: Admin SDK access bypasses firestore.rules, and the
-// /mcp endpoint has no auth. Never add a write here without adding auth.
+// Admin SDK access bypasses firestore.rules: every write below (everything
+// after getTicket) must only be reachable through the authenticated MCP tools
+// registered in mcp-router.server.ts.
 function ticketsCollection(projectId: ProjectId) {
   return getAdminFirestore().collection('projects').doc(projectId).collection('tickets');
 }
@@ -93,4 +94,109 @@ export async function listTickets(
 export async function getTicket(projectId: ProjectId, ticketId: string): Promise<TicketView | null> {
   const doc = await ticketsCollection(projectId).doc(ticketId).get();
   return doc.exists ? toView(doc.id, doc.data()!) : null;
+}
+
+/** Statuses a ticket can be moved to by hand: `resolved` is only reached through a release. */
+export const SPRINT_STATUSES = ['backlog', 'todo', 'inprogress', 'done'] as const satisfies readonly Status[];
+
+export interface TicketChanges {
+  title?: string;
+  description?: string;
+  status?: (typeof SPRINT_STATUSES)[number];
+  priority?: Priority;
+  category?: Category;
+  prLink?: string;
+  bugReportLinks?: string[];
+  timeSpentMinutes?: number;
+  locked?: boolean;
+}
+
+export interface SprintView {
+  sprintNumber: number;
+  sprintName: string;
+  counts: Record<Status, number>;
+}
+
+function projectDoc(projectId: ProjectId) {
+  return getAdminFirestore().collection('projects').doc(projectId);
+}
+
+export async function createTicket(
+  projectId: ProjectId,
+  input: { title: string; description?: string; priority: Priority; category: Category },
+): Promise<TicketView> {
+  const ref = await ticketsCollection(projectId).add({
+    title: input.title,
+    description: input.description ?? '',
+    status: 'backlog',
+    priority: input.priority,
+    category: input.category,
+    createdBy: 'MCP',
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  return (await getTicket(projectId, ref.id))!;
+}
+
+/** Returns null when the ticket doesn't exist. */
+export async function updateTicket(
+  projectId: ProjectId,
+  ticketId: string,
+  changes: TicketChanges,
+): Promise<TicketView | null> {
+  const ref = ticketsCollection(projectId).doc(ticketId);
+  const defined = Object.fromEntries(Object.entries(changes).filter(([, v]) => v !== undefined));
+  try {
+    await ref.update(defined);
+  } catch (error) {
+    if ((error as { code?: number }).code === 5) return null; // NOT_FOUND
+    throw error;
+  }
+  return getTicket(projectId, ticketId);
+}
+
+export async function getSprint(projectId: ProjectId): Promise<SprintView> {
+  const [meta, tickets] = await Promise.all([projectDoc(projectId).get(), ticketsCollection(projectId).get()]);
+  const counts = Object.fromEntries(STATUSES.map((s) => [s, 0])) as Record<Status, number>;
+  for (const doc of tickets.docs) counts[doc.data()['status'] as Status]++;
+  return {
+    sprintNumber: meta.data()?.['sprintNumber'] ?? 1,
+    sprintName: meta.data()?.['sprintName'] ?? 'Sprint 1',
+    counts,
+  };
+}
+
+export async function renameSprint(projectId: ProjectId, sprintName: string): Promise<void> {
+  await projectDoc(projectId).set({ sprintName }, { merge: true });
+}
+
+/**
+ * Same as the app's confirmRelease: every `done` ticket becomes `resolved`
+ * with the version, and the project moves on to the next sprint. Run in a
+ * transaction so two concurrent releases can't both bump the sprint number.
+ */
+export async function releaseSprint(
+  projectId: ProjectId,
+  version: string,
+  nextSprintName?: string,
+): Promise<{ version: string; released: number; sprintNumber: number; sprintName: string }> {
+  const db = getAdminFirestore();
+  return db.runTransaction(async (tx) => {
+    const project = projectDoc(projectId);
+    const [meta, done] = await Promise.all([
+      tx.get(project),
+      tx.get(ticketsCollection(projectId).where('status', '==', 'done')),
+    ]);
+    if (done.empty) throw new NothingToRelease();
+    const sprintNumber = ((meta.data()?.['sprintNumber'] as number | undefined) ?? 1) + 1;
+    const sprintName = nextSprintName || `Sprint ${sprintNumber}`;
+    for (const doc of done.docs) tx.update(doc.ref, { status: 'resolved', version });
+    tx.set(project, { sprintNumber, sprintName }, { merge: true });
+    return { version, released: done.size, sprintNumber, sprintName };
+  });
+}
+
+export class NothingToRelease extends Error {
+  constructor() {
+    super('No ticket is in the done column: nothing to release.');
+  }
 }

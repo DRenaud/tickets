@@ -4,6 +4,7 @@ export const PROJECTS: Project[] = [
   { id: 'alveola', label: 'Alvéola' },
   { id: 'ludistes', label: 'Ludistes Charentais' },
   { id: 'ticket', label: 'Ticketing' },
+  { id: 'onze-gagnant', label: 'Onze Gagnant' },
 ];
 
 export const CATEGORY_META: Record<Category, { emoji: string; labelKey: string }> = {

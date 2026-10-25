@@ -1,5 +1,11 @@
-FROM node:22-alpine AS deps
+FROM node:22-alpine AS base
 WORKDIR /app
+ENV NPM_CONFIG_FETCH_RETRIES=5 \
+    NPM_CONFIG_FETCH_RETRY_FACTOR=2 \
+    NPM_CONFIG_FETCH_RETRY_MINTIMEOUT=20000 \
+    NPM_CONFIG_FETCH_RETRY_MAXTIMEOUT=120000
+
+FROM base AS deps
 COPY package.json package-lock.json ./
 RUN npm ci
 
@@ -8,7 +14,7 @@ WORKDIR /app
 COPY . .
 RUN npm run build
 
-FROM node:22-alpine AS runtime
+FROM base AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json package-lock.json ./

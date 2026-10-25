@@ -34,7 +34,8 @@
   "board": {
     "greeting": {
       "alveola": "Salut ! Voici ce qu'il se passe sur Alvéola 👋",
-      "ludistes": "Coucou les ludistes ! Un coup d'œil sur les tickets 🎲"
+      "ludistes": "Coucou les ludistes ! Un coup d'œil sur les tickets 🎲",
+      "onze-gagnant": "À vos cartes ! Voici les tickets d'Onze Gagnant 🃏"
     }
   },
   "priority": {
